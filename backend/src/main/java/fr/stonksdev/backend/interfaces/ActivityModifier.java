@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ActivityModifier {
-    StonksEvent create(LocalDateTime beginning, Duration duration, String name, String description, Room room,
+    Activity create(LocalDateTime beginning, Duration duration, String name, String description, Room room,
                        List<Equipment> requiredEquipment, int maxPeopleAmount);
 
     boolean modify(Activity activityToModify, Activity activityModified) throws ItemNotFoundException;
