@@ -30,6 +30,7 @@ public class InMemoryDatabase {
         rooms.add(new Room("R.U.", Lunch,200));
         return rooms;
     }
+    List<StonksEvent> getEventList() {return eventList;}
 
     public void incrementEvents() { eventCounter++; }
     public int howManyEvents() { return eventCounter; }
