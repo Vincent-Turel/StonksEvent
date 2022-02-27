@@ -8,6 +8,7 @@ import fr.stonksdev.backend.interfaces.EventModifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,12 +16,14 @@ import java.util.stream.Collectors;
 public class EventManager implements EventModifier {
 
     @Autowired
-    public ActivityManager activityManager;
+    private ActivityManager activityManager;
 
+    @Autowired
+    private InMemoryDatabase inMemoryDatabase;
 
     @Override
-    public StonksEvent create(String name, int maxPeopleAmount, List<Activity> activities) {
-        return new StonksEvent(name, maxPeopleAmount, activities);
+    public StonksEvent create(String name, int maxPeopleAmount, Date startDate, Date endDate) {
+        return new StonksEvent(name, maxPeopleAmount, startDate, endDate);
     }
 
     @Override
@@ -34,10 +37,7 @@ public class EventManager implements EventModifier {
     }
 
     List<Room> getRequiredRoom(String eventName) {
-        /*
-        StonksEvent event = getEvent().findFirst((ev) -> ev.getName() == eventName);
-        return event.getActivities().stream().map(act -> act::getRoom()).collect(Collectors.toList());
-         */
-        throw new RuntimeException();
+        StonksEvent event = inMemoryDatabase.getEventList().stream().filter(ev -> ev.getName().equals(eventName)).findFirst().get();
+        return event.getActivities().stream().map(Activity::getRoom).collect(Collectors.toList());
     }
 }

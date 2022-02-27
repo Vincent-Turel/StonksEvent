@@ -11,6 +11,8 @@ import java.util.List;
 public class InMemoryDatabase {
     private int eventCounter = 0;
     private List<StonksEvent> eventList;
+    List<StonksEvent> getEventList() {return eventList;}
+
 
     public void incrementEvents() { eventCounter++; }
     public int howManyEvents() { return eventCounter; }
