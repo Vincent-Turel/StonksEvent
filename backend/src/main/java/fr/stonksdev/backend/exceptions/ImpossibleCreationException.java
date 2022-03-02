@@ -1,13 +1,13 @@
 package fr.stonksdev.backend.exceptions;
 
-public class NotCreatableException extends Exception {
+public class ImpossibleCreationException extends Exception {
     private String id;
 
-    public NotCreatableException(String id) {
+    public ImpossibleCreationException(String id) {
         this.id = id;
     }
 
-    public NotCreatableException() {
+    public ImpossibleCreationException() {
     }
 
     public String getId() {

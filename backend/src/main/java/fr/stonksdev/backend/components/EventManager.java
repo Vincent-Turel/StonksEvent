@@ -24,7 +24,7 @@ public class EventManager implements EventModifier {
     }
 
     @Override
-    public boolean modify(StonksEvent eventToModify, StonksEvent eventModified) throws ItemNotFoundException {
+    public boolean modify(Activity activityToModify) throws ItemNotFoundException {
         return false;
     }
 

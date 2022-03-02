@@ -9,7 +9,7 @@ import java.util.List;
 public interface EventModifier {
     StonksEvent create(String name, int maxPeopleAmount, List<Activity> activities);
 
-    boolean modify(StonksEvent eventToModify, StonksEvent eventModified) throws ItemNotFoundException;
+    boolean modify(Activity activityToModify) throws ItemNotFoundException;
 
     boolean delete(StonksEvent eventToDelete) throws ItemNotFoundException;
 }
