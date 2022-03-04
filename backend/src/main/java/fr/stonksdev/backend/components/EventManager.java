@@ -10,6 +10,7 @@ import fr.stonksdev.backend.interfaces.EventModifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.swing.text.html.Option;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -45,6 +46,15 @@ public class EventManager implements EventModifier {
     public boolean delete(StonksEvent eventToDelete) throws ItemNotFoundException {
         return false;
     }
+
+    List<Activity> activities(String eventName) throws ItemNotFoundException{
+        Optional<StonksEvent> event = inMemoryDatabase.getEventList().stream().filter(ev -> ev.getName().equals(eventName)).findFirst();
+        if (event.isPresent())
+            return event.get().getActivities();
+        throw new ItemNotFoundException("Event not found");
+    }
+    List<Room> getRequiredRoom(String eventName) throws ItemNotFoundException {
+        return activities(eventName).stream().map(Activity::getRoom).collect(Collectors.toList());
 
     private void changeParamActivity(Activity oldActivity, Activity newActivity) {
         oldActivity.setBeginning(newActivity.getBeginning());

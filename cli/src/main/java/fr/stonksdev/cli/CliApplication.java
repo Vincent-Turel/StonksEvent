@@ -12,7 +12,7 @@ import java.time.Duration;
 @SpringBootApplication
 public class CliApplication {
 
-    @Value("${tcf.host.baseurl}")
+    @Value("${http://localhost:8080}")
     private String serverHostandPort;
 
     public static void main(String[] args) {
