@@ -53,8 +53,10 @@ public class EventManager implements EventModifier {
             return event.get().getActivities();
         throw new ItemNotFoundException("Event not found");
     }
+
     List<Room> getRequiredRoom(String eventName) throws ItemNotFoundException {
         return activities(eventName).stream().map(Activity::getRoom).collect(Collectors.toList());
+    }
 
     private void changeParamActivity(Activity oldActivity, Activity newActivity) {
         oldActivity.setBeginning(newActivity.getBeginning());
@@ -74,15 +76,7 @@ public class EventManager implements EventModifier {
         if (res.isPresent()) {
             return res.get().getActivities();
         }
-
-
+        
         throw new EventIdNotFoundException();
     }
-
-    List<Room> getRequiredRoom(String eventName) {
-        StonksEvent event = inMemoryDatabase.getEventList().stream().filter(ev -> ev.getName().equals(eventName)).findFirst().get();
-        return event.getActivities().stream().map(Activity::getRoom).collect(Collectors.toList());
-    }
-
-
 }
