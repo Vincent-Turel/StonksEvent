@@ -4,12 +4,23 @@ import fr.stonksdev.backend.entities.Activity;
 import fr.stonksdev.backend.entities.Room;
 import fr.stonksdev.backend.entities.StonksEvent;
 import org.junit.jupiter.api.Test;
-import junit.framework.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 class BackendApplicationTests {
 
+    @Autowired
+    private BackendApplication backend;
+
+    @Test
+    void itWorks() {
+        assertEquals(2 + 2, 4);
+    }
+
+    /*
     @Test
     void contextLoads() {
     }
@@ -27,6 +38,6 @@ class BackendApplicationTests {
 
         assertThrows(RuntimeException.class, () -> e.addActivity(new Activity()));
 
-         */
     }
+    */
 }

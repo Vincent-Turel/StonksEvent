@@ -31,10 +31,17 @@ public class InMemoryDatabase {
         return rooms;
     }
 
-    List<StonksEvent> getEventList() {return eventList;}
+    public List<StonksEvent> getEventList() {
+        return eventList;
+    }
 
-    public void incrementEvents() { eventCounter++; }
-    public int howManyEvents() { return eventCounter; }
+    public void incrementEvents() {
+        eventCounter++;
+    }
+
+    public int howManyEvents() {
+        return eventCounter;
+    }
 
     public InMemoryDatabase() {
         flush();
