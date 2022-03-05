@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.w3c.dom.events.Event;
 
 import java.util.Date;
 import java.util.List;
@@ -80,12 +79,12 @@ public class EventController {
     }
 
     @GetMapping(EVENT_URI)
-    public ResponseEntity<List<StonksEvent>> getAllEvents() {
+    public ResponseEntity<Set<StonksEvent>> getAllEvents() {
         return ResponseEntity.ok(event.getAllEvents());
     }
 
     @GetMapping(EVENT_URI + "/activity")
-    public ResponseEntity<List<Activity>> getActivitiesFromEvent(@PathVariable("eventId") String eventId) throws EventIdNotFoundException {
+    public ResponseEntity<Set<Activity>> getActivitiesFromEvent(@PathVariable("eventId") String eventId) throws EventIdNotFoundException {
         return ResponseEntity.ok(event.getActivitiesWithEvent(eventId));
     }
 

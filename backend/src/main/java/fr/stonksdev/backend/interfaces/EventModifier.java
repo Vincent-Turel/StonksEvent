@@ -8,7 +8,7 @@ import fr.stonksdev.backend.exceptions.EventIdNotFoundException;
 import fr.stonksdev.backend.exceptions.ItemNotFoundException;
 
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 public interface EventModifier {
     StonksEvent create(String name, int maxPeopleAmount, Date startDate, Date endDate) throws AlreadyExistingEventException;
@@ -17,7 +17,7 @@ public interface EventModifier {
 
     boolean delete(StonksEvent eventToDelete) throws ItemNotFoundException;
 
-    List<StonksEvent> getAllEvents();
+    Set<StonksEvent> getAllEvents();
 
-    List<Activity> getActivitiesWithEvent(String eventId) throws EventIdNotFoundException;
+    Set<Activity> getActivitiesWithEvent(String eventId) throws EventIdNotFoundException;
 }

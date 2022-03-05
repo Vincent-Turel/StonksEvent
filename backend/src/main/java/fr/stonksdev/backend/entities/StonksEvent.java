@@ -2,7 +2,6 @@ package fr.stonksdev.backend.entities;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -11,7 +10,6 @@ public class StonksEvent implements Serializable {
     private String id;
     private String name;
     private int amountOfPeople;
-    private List<Activity> activities;
     private Date startDate;
     private Date endDate;
 
@@ -35,10 +33,6 @@ public class StonksEvent implements Serializable {
         return amountOfPeople;
     }
 
-    public List<Activity> getActivities() {
-        return activities;
-    }
-
     public Date getStartDate() {
         return startDate;
     }
@@ -52,11 +46,11 @@ public class StonksEvent implements Serializable {
         if (this == o) return true;
         if (!(o instanceof StonksEvent)) return false;
         StonksEvent that = (StonksEvent) o;
-        return getAmountOfPeople() == that.getAmountOfPeople() && Objects.equals(getName(), that.getName()) && Objects.equals(getActivities(), that.getActivities());
+        return getAmountOfPeople() == that.getAmountOfPeople() && Objects.equals(getName(), that.getName());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(), getAmountOfPeople(), getActivities());
+        return Objects.hash(getName(), getAmountOfPeople());
     }
 }

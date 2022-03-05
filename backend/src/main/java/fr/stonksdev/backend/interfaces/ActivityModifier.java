@@ -11,8 +11,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ActivityModifier {
-    Activity create(LocalDateTime beginning, Duration duration, String name, String description, Room room,
-                       List<Equipment> requiredEquipment, int maxPeopleAmount);
+    Activity create(StonksEvent stonksEvent, LocalDateTime beginning, Duration duration, String name, int maxPeopleAmount);
 
     boolean modify(Activity activityToModify, Activity activityModified) throws ItemNotFoundException;
 

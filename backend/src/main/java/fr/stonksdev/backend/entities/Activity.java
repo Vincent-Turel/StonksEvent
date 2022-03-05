@@ -9,17 +9,21 @@ public class Activity {
     private Duration duration;
     private String name;
     private String description;
-    private Room room;
-    private List<Equipment> requiredEquipment;
     private int maxPeopleAmount;
 
-    public Activity(LocalDateTime beginning, Duration duration, String name, String description, Room room, List<Equipment> requiredEquipment, int maxPeopleAmount){
+    public Activity(LocalDateTime beginning, Duration duration, String name, String description, int maxPeopleAmount){
         this.beginning = beginning;
         this.duration = duration;
         this.name = name;
         this.description = description;
-        this.room = room;
-        this.requiredEquipment = requiredEquipment;
+        this.maxPeopleAmount = maxPeopleAmount;
+    }
+
+    public Activity(LocalDateTime beginning, Duration duration, String name, int maxPeopleAmount){
+        this.beginning = beginning;
+        this.duration = duration;
+        this.name = name;
+        this.description = "Empty";
         this.maxPeopleAmount = maxPeopleAmount;
     }
 
@@ -49,20 +53,6 @@ public class Activity {
     }
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public Room getRoom() {
-        return room;
-    }
-    public void setRoom(Room room) {
-        this.room = room;
-    }
-
-    public List<Equipment> getRequiredEquipment() {
-        return requiredEquipment;
-    }
-    public void setRequiredEquipment(List<Equipment> requiredEquipment) {
-        this.requiredEquipment = requiredEquipment;
     }
 
     public int getMaxPeopleAmount() {

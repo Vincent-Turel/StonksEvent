@@ -1,22 +1,25 @@
 package fr.stonksdev.backend.components;
 
 import fr.stonksdev.backend.entities.Activity;
-import fr.stonksdev.backend.entities.Equipment;
-import fr.stonksdev.backend.entities.Room;
 import fr.stonksdev.backend.entities.StonksEvent;
 import fr.stonksdev.backend.exceptions.ItemNotFoundException;
 import fr.stonksdev.backend.interfaces.ActivityModifier;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Component
 public class ActivityManager implements ActivityModifier {
+    @Autowired
+    private InMemoryDatabase memory;
+
     @Override
-    public Activity create(LocalDateTime beginning, Duration duration, String name, String description, Room room, List<Equipment> requiredEquipment, int maxPeopleAmount){
-        return new Activity(beginning, duration, name, description, room, requiredEquipment, maxPeopleAmount);
+    public Activity create(StonksEvent stonksEvent, LocalDateTime beginning, Duration duration, String name, int maxPeopleAmount){
+        Activity activity = new Activity(beginning,duration,name,maxPeopleAmount);
+        memory.getActivities().get(stonksEvent).add(activity);
+        return activity;
     }
 
     @Override

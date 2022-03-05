@@ -10,10 +10,7 @@ import fr.stonksdev.backend.interfaces.EventModifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.swing.text.html.Option;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -27,7 +24,10 @@ public class EventManager implements EventModifier {
 
     @Override
     public StonksEvent create(String name, int maxPeopleAmount, Date startDate, Date endDate) {
-        return new StonksEvent(name, maxPeopleAmount, startDate, endDate);
+        StonksEvent stonksEvent = new StonksEvent(name,maxPeopleAmount,startDate,endDate);
+        inMemoryDatabase.incrementEvents();
+        inMemoryDatabase.getEvents().put(stonksEvent.getId(),stonksEvent);
+        return stonksEvent;
     }
 
     @Override
@@ -47,10 +47,10 @@ public class EventManager implements EventModifier {
         return false;
     }
 
-    List<Activity> activities(String eventName) throws ItemNotFoundException{
-        Optional<StonksEvent> event = inMemoryDatabase.getEventList().stream().filter(ev -> ev.getName().equals(eventName)).findFirst();
+    Set<Activity> activities(String eventName) throws ItemNotFoundException{
+        Optional<StonksEvent> event = inMemoryDatabase.getEvents().values().stream().filter(ev -> ev.getName().equals(eventName)).findFirst();
         if (event.isPresent())
-            return event.get().getActivities();
+            return inMemoryDatabase.getActivities().get(event.get());
         throw new ItemNotFoundException("Event not found");
     }
 
@@ -60,23 +60,19 @@ public class EventManager implements EventModifier {
 
     private void changeParamActivity(Activity oldActivity, Activity newActivity) {
         oldActivity.setBeginning(newActivity.getBeginning());
-        oldActivity.setRoom(newActivity.getRoom());
         oldActivity.setDescription(newActivity.getDescription());
         oldActivity.setDuration(newActivity.getDuration());
         oldActivity.setMaxPeopleAmount(newActivity.getMaxPeopleAmount());
-        oldActivity.setRequiredEquipment(newActivity.getRequiredEquipment());
     }
 
-    public List<StonksEvent> getAllEvents() {
-        return inMemoryDatabase.getEventList();
+    public Set<StonksEvent> getAllEvents() {
+        return new HashSet<>(inMemoryDatabase.getEvents().values());
     }
 
-    public List<Activity> getActivitiesWithEvent(String eventId) throws EventIdNotFoundException {
-        Optional<StonksEvent> res = inMemoryDatabase.getEventList().stream().filter(stonksEvent -> stonksEvent.getId().equals(eventId)).findFirst();
-        if (res.isPresent()) {
-            return res.get().getActivities();
+    public Set<Activity> getActivitiesWithEvent(String eventId) throws EventIdNotFoundException {
+        if (!inMemoryDatabase.getEvents().containsKey(eventId)){
+            throw new EventIdNotFoundException();
         }
-        
-        throw new EventIdNotFoundException();
+        return inMemoryDatabase.getActivities().get(inMemoryDatabase.getEvents().get(eventId));
     }
 }
