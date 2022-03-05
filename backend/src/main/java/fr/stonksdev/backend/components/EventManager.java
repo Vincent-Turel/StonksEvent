@@ -54,8 +54,10 @@ public class EventManager implements EventModifier {
         throw new ItemNotFoundException("Event not found");
     }
 
+    // TODO(danlux18): fix this horrible mess.
     List<Room> getRequiredRoom(String eventName) throws ItemNotFoundException {
-        return activities(eventName).stream().map(Activity::getRoom).collect(Collectors.toList());
+        // return activities(eventName).stream().map(Activity::getRoom).collect(Collectors.toList());
+        return null;
     }
 
     private void changeParamActivity(Activity oldActivity, Activity newActivity) {
