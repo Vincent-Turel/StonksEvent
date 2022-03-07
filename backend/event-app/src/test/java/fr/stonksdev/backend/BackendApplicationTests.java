@@ -1,8 +1,5 @@
 package fr.stonksdev.backend;
 
-import fr.stonksdev.backend.entities.Activity;
-import fr.stonksdev.backend.entities.Room;
-import fr.stonksdev.backend.entities.StonksEvent;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

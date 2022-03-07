@@ -1,9 +1,6 @@
 package fr.stonksdev.backend.controllers.dto;
 
-import fr.stonksdev.backend.entities.Activity;
-
 import java.util.Date;
-import java.util.List;
 
 public class StonksEventDTO {
 

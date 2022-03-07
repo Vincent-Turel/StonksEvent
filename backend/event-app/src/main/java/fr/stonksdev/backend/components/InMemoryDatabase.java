@@ -2,7 +2,6 @@ package fr.stonksdev.backend.components;
 
 import fr.stonksdev.backend.entities.Activity;
 import fr.stonksdev.backend.entities.Room;
-import fr.stonksdev.backend.entities.RoomKind;
 import fr.stonksdev.backend.entities.StonksEvent;
 import org.springframework.stereotype.Component;
 

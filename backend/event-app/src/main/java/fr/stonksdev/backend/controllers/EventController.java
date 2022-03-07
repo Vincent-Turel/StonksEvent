@@ -1,6 +1,5 @@
 package fr.stonksdev.backend.controllers;
 
-import fr.stonksdev.backend.components.InMemoryDatabase;
 import fr.stonksdev.backend.controllers.dto.ErrorDTO;
 import fr.stonksdev.backend.controllers.dto.StonksEventDTO;
 import fr.stonksdev.backend.entities.Activity;
@@ -12,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
