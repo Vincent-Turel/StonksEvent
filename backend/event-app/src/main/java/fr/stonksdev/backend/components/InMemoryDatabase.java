@@ -80,7 +80,10 @@ public class InMemoryDatabase {
     }
 
     public InMemoryDatabase() {
-        flush();
+        events = new HashMap<>();
+        activities = new HashMap<>();
+        rooms = new HashMap<>();
+        eventCounter = 0;
     }
 
     public int getEventCounter() {
@@ -92,9 +95,9 @@ public class InMemoryDatabase {
     }
 
     public void flush() {
-        events = new HashMap<>();
-        activities = new HashMap<>();
-        rooms = new HashMap<>();
+        events.clear();
+        activities.clear();
+        rooms.clear();
         eventCounter = 0;
     }
 }
