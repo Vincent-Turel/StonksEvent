@@ -12,53 +12,89 @@ import static fr.stonksdev.backend.entities.RoomKind.*;
 @Component
 public class InMemoryDatabase {
     private int eventCounter = 0;
+    private int activityCounter = 0;
 
-    private Map<String, StonksEvent> events;
-    public Map<String, StonksEvent> getEvents() {
+    private Map<UUID, StonksEvent> events;
+
+    public Map<UUID, StonksEvent> getEvents() {
         return events;
     }
 
-    private Map<StonksEvent, Set<Activity>> activities;
-    public Map<StonksEvent, Set<Activity>> getActivities() {
+    public UUID addEvent(StonksEvent newEvent) {
+        events.put(newEvent.getId(), newEvent);
+        eventCounter++;
+        return newEvent.getId();
+    }
+
+    private Map<String, Activity> activities;
+
+    public Map<String, Activity> getActivities() {
         return activities;
     }
 
+    public boolean addActivity(Activity newActivity) {
+        int check = 0;
+        if (!activities.isEmpty()) {
+            for (Map.Entry<String, Activity> item : activities.entrySet()) {
+                if (item.getKey().equals(newActivity.getEventUUID().toString() + newActivity.getName())) {
+                    check++;
+                }
+            }
+        }
+        if (check == 0) {
+            activities.put(newActivity.getEventUUID().toString() + newActivity.getName(), newActivity);
+            activityCounter++;
+            return true;
+        }
+        return false;
+    }
+
+    public List<String> deleteEvent(UUID eventId) {
+        List<String> activitiesDel = new ArrayList<>();
+        if (!activities.isEmpty()) {
+            Iterator<Map.Entry<String, Activity>> it = activities.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry<String, Activity> item = it.next();
+                if (item.getKey().contains(eventId.toString())) {
+                    activitiesDel.add(item.getValue().getName());
+                    it.remove();
+                    activityCounter--;
+                }
+            }
+        }
+        events.remove(eventId);
+        eventCounter--;
+        return activitiesDel;
+    }
+
+    public void deleteActivity(String activityId) {
+        activities.remove(activityId);
+        activityCounter--;
+    }
+
+
     private Map<Room, Set<Activity>> rooms;
+
     public Map<Room, Set<Activity>> getRooms() {
         return rooms;
-    }
-
-    private List<Room> roomList;
-
-    private void populateRoom() {
-        roomList = new ArrayList<>();
-        roomList.add(new Room("O+304", Demonstration,36));
-        roomList.add(new Room("O+305", Demonstration,34));
-        roomList.add(new Room("O+306", Demonstration,32));
-        roomList.add(new Room("E+100", Demonstration,36));
-        roomList.add(new Room("E+102", Demonstration,30));
-        roomList.add(new Room("A1", Amphitheatre,80));
-        roomList.add(new Room("Amphi forum", Amphitheatre,90));
-        roomList.add(new Room("Cafétéria", Lunch,50));
-        roomList.add(new Room("R.U.", Lunch,200));
-        for (Room room: roomList) {
-            rooms.put(room,new HashSet<>());
-        }
-    }
-
-    public void incrementEvents() {
-        eventCounter++;
     }
 
     public InMemoryDatabase() {
         flush();
     }
 
+    public int getEventCounter() {
+        return eventCounter;
+    }
+
+    public int getActivityCounter() {
+        return activityCounter;
+    }
+
     public void flush() {
         events = new HashMap<>();
         activities = new HashMap<>();
         rooms = new HashMap<>();
-        populateRoom();
         eventCounter = 0;
     }
 }

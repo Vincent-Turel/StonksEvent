@@ -1,12 +1,7 @@
 package fr.stonksdev.backend.controllers;
 
 import fr.stonksdev.backend.controllers.dto.ErrorDTO;
-import fr.stonksdev.backend.controllers.dto.StonksEventDTO;
-import fr.stonksdev.backend.entities.Activity;
-import fr.stonksdev.backend.entities.StonksEvent;
 import fr.stonksdev.backend.exceptions.*;
-import fr.stonksdev.backend.interfaces.EventModifier;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +16,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class EventController {
     public static final String EVENT_URI = "/events";
 
-    @Autowired
-    private EventModifier event;
+    /*private EventModifier event;*/
 
     @ExceptionHandler({ImpossibleCreationException.class})
     public ResponseEntity<ErrorDTO> handleExceptions(ImpossibleCreationException e)  {
@@ -64,7 +58,7 @@ public class EventController {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorDTO);
     }
 
-    @PostMapping(path = "register", consumes = APPLICATION_JSON_VALUE) // path is a REST CONTROLLER NAME
+    /*@PostMapping(path = "register", consumes = APPLICATION_JSON_VALUE) // path is a REST CONTROLLER NAME
     public ResponseEntity<StonksEventDTO> register(@RequestBody StonksEventDTO eventDTO)  {
         try {
             return ResponseEntity.status(HttpStatus.CREATED)
@@ -92,6 +86,7 @@ public class EventController {
     }
 
     private StonksEventDTO convertEventToDto (StonksEvent event) { // In more complex cases, we could use ModelMapper
-        return new StonksEventDTO(event.getId(), event.getName(), event.getAmountOfPeople(), event.getStart(), event.getEndDate());
-    }
+        /*return new StonksEventDTO(event.getId(), event.getName(), event.getAmountOfPeople(), event.getStartDate(), event.getEndDate());*/
+        /*return null;
+    }*/
 }
