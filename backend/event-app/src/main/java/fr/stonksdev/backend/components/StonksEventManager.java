@@ -8,10 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Component
 public class StonksEventManager implements StonksEventModifier {
@@ -32,12 +29,12 @@ public class StonksEventManager implements StonksEventModifier {
 
     @Override
     public void setNewEventName(String newName, UUID eventId) {
-        inMemoryDatabase.getEvents().get(eventId).setName(newName);
+        getAnEvent(eventId).setName(newName);
     }
 
     @Override
     public void setNewAmount(int newMaxPeopleAmount, UUID eventId) {
-        inMemoryDatabase.getEvents().get(eventId).setAmountOfPeople(newMaxPeopleAmount);
+        getAnEvent(eventId).setAmountOfPeople(newMaxPeopleAmount);
     }
 
     /*
@@ -83,27 +80,27 @@ public class StonksEventManager implements StonksEventModifier {
      */
     @Override
     public void setNewActivityName(String newName, UUID eventId, String name) {
-        inMemoryDatabase.getActivities().get(eventId.toString() + name).setName(newName);
+        getAnActivity(eventId, name).setName(newName);
     }
 
     @Override
     public void setNewActivityBeginning(LocalDateTime newBeginning, UUID eventId, String name) {
-        inMemoryDatabase.getActivities().get(eventId.toString() + name).setBeginning(newBeginning);
+        getAnActivity(eventId, name).setBeginning(newBeginning);
     }
 
     @Override
     public void setNewActivityDuration(Duration newDuration, UUID eventId, String name) {
-        inMemoryDatabase.getActivities().get(eventId.toString() + name).setDuration(newDuration);
+        getAnActivity(eventId, name).setDuration(newDuration);
     }
 
     @Override
     public void setNewActivityDescription(String newDescription, UUID eventId, String name) {
-        inMemoryDatabase.getActivities().get(eventId.toString() + name).setDescription(newDescription);
+        getAnActivity(eventId, name).setDescription(newDescription);
     }
 
     @Override
     public void setNewActivityMaxPeopleAmount(int newMaxPeopleAmount, UUID eventId, String name) {
-        inMemoryDatabase.getActivities().get(eventId.toString() + name).setMaxPeopleAmount(newMaxPeopleAmount);
+        getAnActivity(eventId, name).setMaxPeopleAmount(newMaxPeopleAmount);
     }
 
     /*
@@ -127,15 +124,27 @@ public class StonksEventManager implements StonksEventModifier {
     }
 
     public StonksEvent getAnEvent(UUID eventId) {
-        return inMemoryDatabase.getEvents().get(eventId);
+        StonksEvent event = getAllEvent().get(eventId);
+
+        if (Objects.isNull(event)) {
+            throw new NoSuchElementException("No such event: " + eventId);
+        }
+
+        return event;
     }
 
     public Map<UUID, StonksEvent> getAllEvent() {
         return inMemoryDatabase.getEvents();
     }
 
-    public Activity getAnActivity(UUID eventId, String activityName) {
-        return inMemoryDatabase.getActivities().get(eventId.toString() + activityName);
+    public Activity getAnActivity(UUID eventId, String name) {
+        Activity activity = getAllActivities().get(eventId + name);
+
+        if (Objects.isNull(activity)) {
+            throw new NoSuchElementException("No such activity: " + eventId + name);
+        }
+
+        return activity;
     }
 
     public Map<String, Activity> getAllActivities() {
