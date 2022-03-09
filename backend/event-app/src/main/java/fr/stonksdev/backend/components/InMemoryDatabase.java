@@ -22,10 +22,16 @@ public class InMemoryDatabase {
         return activities;
     }
 
-    private Map<Room, Set<Activity>> rooms;
+    private Map<UUID, Room> rooms;
 
-    public Map<Room, Set<Activity>> getRooms() {
+    public Map<UUID, Room> getRooms() {
         return rooms;
+    }
+
+    private Map<UUID, Set<Activity>> roomPlanning;
+
+    public Map<UUID, Set<Activity>> getRoomPlanning() {
+        return roomPlanning;
     }
 
     public InMemoryDatabase() {

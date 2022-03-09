@@ -1,15 +1,18 @@
 package fr.stonksdev.backend.entities;
 
+import java.util.UUID;
+
 public class Room extends Place {
+    private UUID id;
     private String name;
     private RoomKind roomKind;
     private int capacity;
-    //private List<Equipment> ==> A REFLECHIR
 
     public Room(String name, RoomKind roomKind, int capacity) {
         this.name = name;
         this.roomKind = roomKind;
         this.capacity = capacity;
+        id = UUID.randomUUID();
     }
 
     public String getName() {
@@ -34,5 +37,9 @@ public class Room extends Place {
 
     public void setCapacity(int capacity) {
         this.capacity = capacity;
+    }
+
+    public UUID getId() {
+        return id;
     }
 }
