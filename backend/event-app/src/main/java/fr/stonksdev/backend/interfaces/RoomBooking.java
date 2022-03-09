@@ -1,6 +1,7 @@
 package fr.stonksdev.backend.interfaces;
 
-import java.time.Duration;
+import fr.stonksdev.backend.entities.Duration;
+
 import java.time.LocalDateTime;
 
 public interface RoomBooking {

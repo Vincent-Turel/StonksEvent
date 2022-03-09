@@ -1,9 +1,10 @@
 package fr.stonksdev.backend.interfaces;
 
+import fr.stonksdev.backend.entities.Duration;
 import fr.stonksdev.backend.entities.Room;
 import fr.stonksdev.backend.entities.RoomKind;
 
-import java.time.Duration;
+
 import java.time.LocalDateTime;
 
 public interface RoomExplorer {
