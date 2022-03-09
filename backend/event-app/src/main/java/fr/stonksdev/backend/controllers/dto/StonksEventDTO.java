@@ -1,21 +1,22 @@
 package fr.stonksdev.backend.controllers.dto;
 
-import java.util.Date;
+import fr.stonksdev.backend.entities.Duration;
+
+import java.time.LocalDateTime;
 
 public class StonksEventDTO {
-
-    private String id;
+    private final String id;
     private String name;
     private int amountOfPeople;
-    private Date startDate;
-    private Date endDate;
+    private LocalDateTime start;
+    private Duration duration;
 
-    public StonksEventDTO(String id, String name, int amountOfPeople, Date startDate, Date endDate)  {
+    public StonksEventDTO(String id, String name, int amountOfPeople, LocalDateTime start, Duration duration) {
         this.id = id;
         this.name = name;
         this.amountOfPeople = amountOfPeople;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.start = start;
+        this.duration = duration;
     }
 
     public String getId() {
@@ -38,20 +39,20 @@ public class StonksEventDTO {
         this.amountOfPeople = amountOfPeople;
     }
 
-    public Date getStartDate() {
-        return startDate;
+    public LocalDateTime getStart() {
+        return start;
     }
 
-    public Date getEndDate() {
-        return endDate;
+    public Duration getDuration() {
+        return duration;
     }
 
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
+    public void setStartDate(LocalDateTime start) {
+        this.start = start;
     }
 
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
+    public void setDuration(Duration duration) {
+        this.duration = duration;
     }
 
     @Override
@@ -62,5 +63,4 @@ public class StonksEventDTO {
                 ", amountOfPeople=" + amountOfPeople +
                 '}';
     }
-
 }

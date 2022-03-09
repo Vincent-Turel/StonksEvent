@@ -1,13 +1,13 @@
 package fr.stonksdev.backend.components;
 
 import fr.stonksdev.backend.entities.Activity;
+import fr.stonksdev.backend.entities.Duration;
 import fr.stonksdev.backend.entities.StonksEvent;
 import fr.stonksdev.backend.exceptions.ItemNotFoundException;
 import fr.stonksdev.backend.interfaces.ActivityModifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Component
@@ -16,8 +16,8 @@ public class ActivityManager implements ActivityModifier {
     private InMemoryDatabase memory;
 
     @Override
-    public Activity create(StonksEvent stonksEvent, LocalDateTime beginning, Duration duration, String name, int maxPeopleAmount){
-        Activity activity = new Activity(beginning,duration,name,maxPeopleAmount);
+    public Activity create(StonksEvent stonksEvent, LocalDateTime beginning, Duration duration, String name, int maxPeopleAmount) {
+        Activity activity = new Activity(beginning, duration, name, maxPeopleAmount);
         memory.getActivities().get(stonksEvent).add(activity);
         return activity;
     }

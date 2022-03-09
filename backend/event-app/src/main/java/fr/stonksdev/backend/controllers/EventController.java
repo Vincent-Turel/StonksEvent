@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Set;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -69,7 +68,7 @@ public class EventController {
     public ResponseEntity<StonksEventDTO> register(@RequestBody StonksEventDTO eventDTO)  {
         try {
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(convertEventToDto(event.create(eventDTO.getName(), eventDTO.getAmountOfPeople(), eventDTO.getStartDate(), eventDTO.getEndDate())));
+                    .body(convertEventToDto(event.create(eventDTO.getName(), eventDTO.getAmountOfPeople(), eventDTO.getStart(), eventDTO.getDuration())));
         } catch (AlreadyExistingEventException e) {
             // Note: Returning 409 (Conflict) can also be seen a security/privacy vulnerability, exposing a service for account enumeration
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
@@ -93,6 +92,6 @@ public class EventController {
     }
 
     private StonksEventDTO convertEventToDto (StonksEvent event) { // In more complex cases, we could use ModelMapper
-        return new StonksEventDTO(event.getId(), event.getName(), event.getAmountOfPeople(), event.getStartDate(), event.getEndDate());
+        return new StonksEventDTO(event.getId(), event.getName(), event.getAmountOfPeople(), event.getStart(), event.getEndDate());
     }
 }

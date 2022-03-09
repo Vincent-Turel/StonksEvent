@@ -1,23 +1,22 @@
 package fr.stonksdev.backend.entities;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
 public class StonksEvent implements Serializable {
+    private final String id;
+    private final String name;
+    private final int amountOfPeople;
+    private final LocalDateTime start;
+    private final Duration duration;
 
-    private String id;
-    private String name;
-    private int amountOfPeople;
-    private Date startDate;
-    private Date endDate;
-
-    public StonksEvent(String name, int amountOfPeople, Date startDate, Date endDate)  {
+    public StonksEvent(String name, int amountOfPeople, LocalDateTime start, Duration duration) {
         this.name = name;
         this.amountOfPeople = amountOfPeople;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.start = start;
+        this.duration = duration;
         this.id = UUID.randomUUID().toString();
     }
 
@@ -33,12 +32,12 @@ public class StonksEvent implements Serializable {
         return amountOfPeople;
     }
 
-    public Date getStartDate() {
-        return startDate;
+    public LocalDateTime getStart() {
+        return start;
     }
 
-    public Date getEndDate() {
-        return endDate;
+    public Duration getEndDate() {
+        return duration;
     }
 
     @Override

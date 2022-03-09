@@ -1,14 +1,11 @@
 package fr.stonksdev.backend.interfaces;
 
 import fr.stonksdev.backend.entities.Activity;
-import fr.stonksdev.backend.entities.Equipment;
-import fr.stonksdev.backend.entities.Room;
+import fr.stonksdev.backend.entities.Duration;
 import fr.stonksdev.backend.entities.StonksEvent;
 import fr.stonksdev.backend.exceptions.ItemNotFoundException;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.List;
 
 public interface ActivityModifier {
     Activity create(StonksEvent stonksEvent, LocalDateTime beginning, Duration duration, String name, int maxPeopleAmount);
