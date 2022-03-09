@@ -1,15 +1,19 @@
 package fr.stonksdev.backend.components;
 
+import fr.stonksdev.backend.entities.Activity;
 import fr.stonksdev.backend.entities.Duration;
 import fr.stonksdev.backend.entities.Room;
 import fr.stonksdev.backend.entities.RoomKind;
 import fr.stonksdev.backend.exceptions.AlreadyExistingRoomException;
+import fr.stonksdev.backend.exceptions.RoomAlreadyBookedException;
 import fr.stonksdev.backend.exceptions.RoomIdNotFoundException;
 import fr.stonksdev.backend.interfaces.RoomBooking;
 import fr.stonksdev.backend.interfaces.RoomModifier;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 
 public class RoomManager implements RoomBooking, RoomModifier {
@@ -18,7 +22,22 @@ public class RoomManager implements RoomBooking, RoomModifier {
     private InMemoryDatabase memory;
 
     @Override
-    public boolean bookRoom(UUID roomId, LocalDateTime beginning, Duration duration, String activityId) {
+    public boolean bookRoom(UUID roomId, LocalDateTime beginning, Duration duration, String activityId) throws RoomIdNotFoundException, RoomAlreadyBookedException {
+        TreeSet<Activity> activities = memory.getRoomPlanning().get(roomId);
+
+        if (activities != null){
+            //TODO: refactor when activity UUID
+            if (activities.isEmpty()){
+                //memory.
+            }
+            if (activities.stream().noneMatch(activity -> activity.getName().equals(activityId))){
+                boolean canBookRoom = true;
+
+                for (Activity activity: activities) {
+
+                }
+            }
+        }
         return false;
     }
 
@@ -34,6 +53,7 @@ public class RoomManager implements RoomBooking, RoomModifier {
         }
         Room room = new Room(name, roomKind, capacity);
         memory.getRooms().put(room.getId(),room);
+        memory.getRoomPlanning().put(room.getId(), new TreeSet<>(new Activity.TimingComparator()));
         return room;
     }
 

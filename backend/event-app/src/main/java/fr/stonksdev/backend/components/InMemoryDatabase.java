@@ -28,9 +28,8 @@ public class InMemoryDatabase {
         return rooms;
     }
 
-    private Map<UUID, Set<Activity>> roomPlanning;
-
-    public Map<UUID, Set<Activity>> getRoomPlanning() {
+    private Map<UUID, TreeSet<Activity>> roomPlanning;
+    public Map<UUID, TreeSet<Activity>> getRoomPlanning() {
         return roomPlanning;
     }
 
@@ -42,5 +41,6 @@ public class InMemoryDatabase {
         events = new HashMap<>();
         activities = new HashMap<>();
         rooms = new HashMap<>();
+        roomPlanning = new HashMap<>();
     }
 }
