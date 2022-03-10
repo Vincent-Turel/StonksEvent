@@ -11,6 +11,7 @@ public class Activity {
     private String description;
     private int maxPeopleAmount;
     private final UUID eventUUID;
+    private final UUID activityID;
 
     public Activity(LocalDateTime beginning, Duration duration, String name, String description, int maxPeopleAmount, UUID eventUUID) {
         this.beginning = beginning;
@@ -19,26 +20,27 @@ public class Activity {
         this.description = description;
         this.maxPeopleAmount = maxPeopleAmount;
         this.eventUUID = eventUUID;
+        this.activityID = UUID.randomUUID();
     }
 
     public Activity(LocalDateTime beginning, Duration duration, String name, int maxPeopleAmount, UUID eventUUID) {
         this.beginning = beginning;
         this.duration = duration;
         this.name = name;
-        // FIXME(scrabsha): is this a good idea to provide a placeholder text
-        // here?
-        this.description = "Empty";
+        this.description = "";
         this.maxPeopleAmount = maxPeopleAmount;
         this.eventUUID = eventUUID;
+        this.activityID = UUID.randomUUID();
     }
 
     public Activity(LocalDateTime beginning, Duration duration, String name, UUID eventUUID) {
         this.beginning = beginning;
         this.duration = duration;
         this.name = name;
-        this.description = "Empty";
+        this.description = "";
         this.maxPeopleAmount = 9999;
         this.eventUUID = eventUUID;
+        this.activityID = UUID.randomUUID();
     }
 
     public LocalDateTime getBeginning() {
@@ -81,8 +83,12 @@ public class Activity {
         this.maxPeopleAmount = newMaxPeopleAmount;
     }
 
-    public UUID getEventUUID() {
+    public UUID getEventId() {
         return this.eventUUID;
+    }
+
+    public UUID getActivityID() {
+        return this.activityID;
     }
 
     @Override
@@ -92,7 +98,7 @@ public class Activity {
         Activity that = (Activity) o;
         return getMaxPeopleAmount() == that.getMaxPeopleAmount()
                 && Objects.equals(getName(), that.getName())
-                && Objects.equals(getEventUUID(), that.getEventUUID())
+                && Objects.equals(getEventId(), that.getEventId())
                 && Objects.equals(getDescription(), that.getDescription())
                 && Objects.equals(getDuration(), that.getDuration())
                 && Objects.equals(getBeginning(), that.getBeginning());
@@ -100,6 +106,6 @@ public class Activity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(), getBeginning(), getEventUUID(), getDescription(), getDuration(), getMaxPeopleAmount());
+        return Objects.hash(getName(), getBeginning(), getEventId(), getDescription(), getDuration(), getMaxPeopleAmount());
     }
 }

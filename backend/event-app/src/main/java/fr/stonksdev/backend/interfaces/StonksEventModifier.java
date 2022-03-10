@@ -26,22 +26,20 @@ public interface StonksEventModifier {
     void createActivity(LocalDateTime beginning, Duration duration, String name, int maxPeopleAmount, UUID eventId);
     void createActivity(LocalDateTime beginning, Duration duration, String name, UUID eventId);
 
-    void setNewActivityName(String newName, UUID eventId, String name);
-    void setNewActivityBeginning(LocalDateTime newBeginning, UUID eventId, String name);
-    void setNewActivityDuration(Duration newDuration, UUID eventId, String name);
-    void setNewActivityDescription(String newDescription, UUID eventId, String name);
-    void setNewActivityMaxPeopleAmount(int newMaxPeopleAmount, UUID eventId, String name);
+    void setNewActivityName(String newName, UUID activityId);
+    void setNewActivityBeginning(LocalDateTime newBeginning, UUID activityId);
+    void setNewActivityDuration(Duration newDuration, UUID activityId);
+    void setNewActivityDescription(String newDescription, UUID activityId);
+    void setNewActivityMaxPeopleAmount(int newMaxPeopleAmount, UUID activityId);
 
-    void deleteActivity(UUID eventId, String activityName);
+    void deleteActivity(UUID activityId);
 
     /*
     GETTER :
      */
-
-    public int getNbEvent();
-    public int getNbActivity();
     public StonksEvent getAnEvent(UUID eventId);
     public Map<UUID, StonksEvent> getAllEvent();
-    public Activity getAnActivity(UUID eventId, String activityName);
-    public Map<String, Activity> getAllActivities();
+    public Activity getAnActivity(UUID activityId);
+    public Map<UUID, Activity> getAllActivities();
+    public void reset();
 }
