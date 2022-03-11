@@ -3,6 +3,7 @@ package fr.stonksdev.backend.components;
 import fr.stonksdev.backend.entities.Activity;
 import fr.stonksdev.backend.entities.Duration;
 import fr.stonksdev.backend.entities.StonksEvent;
+import fr.stonksdev.backend.interfaces.Mail;
 import fr.stonksdev.backend.interfaces.StonksEventModifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,9 @@ public class StonksEventManager implements StonksEventModifier {
     @Autowired
     private InMemoryDatabase inMemoryDatabase;
 
+    @Autowired
+    private Mail mailProxy;
+
     private List<UUID> eventIdList = new ArrayList<>();
     private List<UUID> activitiesId = new ArrayList<>();
 
@@ -27,6 +31,8 @@ public class StonksEventManager implements StonksEventModifier {
         StonksEvent newEvent = new StonksEvent(name, maxPeopleAmount, startDate, endDate);
         inMemoryDatabase.getEvents().put(newEvent.getId(), newEvent);
         eventIdList.add(newEvent.getId());
+        mailProxy.send("stonksdev.polyevent@gmail.com", "New event created",
+                  "An event called " + name + "has been created.");
     }
 
     @Override

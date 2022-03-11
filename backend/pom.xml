@@ -90,12 +90,12 @@
         <repository>
             <id>central</id>
             <name>5b4c3e84e809-releases</name>
-            <url>https://teamh.fr/artifactory/test</url>
+            <url>http://vmpx08.polytech.unice.fr:8016/artifactory/teamh/</url>
         </repository>
         <snapshotRepository>
             <id>snapshots</id>
             <name>5b4c3e84e809-snapshots</name>
-            <url>https://teamh.fr/artifactory/test</url>
+            <url>http://vmpx08.polytech.unice.fr:8016/artifactory/teamh/</url>
         </snapshotRepository>
     </distributionManagement>
 </project>

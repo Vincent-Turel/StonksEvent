@@ -1,11 +1,15 @@
 package fr.stonksdev.backend.components;
 
 import fr.stonksdev.backend.entities.Duration;
+import fr.stonksdev.backend.interfaces.Mail;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 
@@ -17,6 +21,9 @@ public class StonksEventManagerActivityTest {
     @Autowired
     private StonksEventManager manager;
 
+    @MockBean
+    private Mail mailMock;
+
     private final LocalDateTime date_1 = LocalDateTime.of(2022, 1, 1, 12, 12);
     private final LocalDateTime date_2 = LocalDateTime.of(2022, 1, 5, 13, 12);
     private final Duration duration_1 = Duration.ofMinutes(120);
@@ -24,6 +31,8 @@ public class StonksEventManagerActivityTest {
 
     @BeforeEach
     void setup() {
+        when(mailMock.send(anyString(),anyString(), anyString())).thenReturn(true);
+
         manager.reset();
         manager.createEvent("ActivityEvent", 150, date_1, date_2);
         manager.createActivity(date_1, duration_1, "MyLittlePony", "Pony are love, pony are life", 50, manager.getEventIdList().get(0));
