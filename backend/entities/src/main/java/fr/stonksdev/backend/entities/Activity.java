@@ -44,13 +44,8 @@ public class Activity {
         this.activityID = UUID.randomUUID();
     }
 
-    public static class TimingComparator implements Comparator<Activity>{
-        public TimingComparator() {}
-
-        @Override
-        public int compare(Activity o1, Activity o2) {
-            return  o1.beginning.compareTo(o2.beginning);
-        }
+    public LocalDateTime getEndDate(){
+        return beginning.plusMinutes(duration.asMinutes());
     }
 
     public LocalDateTime getBeginning() {

@@ -28,8 +28,10 @@ public class InMemoryDatabase {
         return rooms;
     }
 
-    private Map<UUID, TreeSet<Activity>> roomPlanning;
-    public Map<UUID, TreeSet<Activity>> getRoomPlanning() {
+    //roomID -> List of activityId for the corresponding room
+    private Map<UUID, List<UUID>> roomPlanning;
+
+    public Map<UUID, List<UUID>> getRoomPlanning() {
         return roomPlanning;
     }
 

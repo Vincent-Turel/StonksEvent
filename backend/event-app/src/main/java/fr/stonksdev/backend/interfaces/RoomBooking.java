@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public interface RoomBooking {
-    boolean bookRoom(UUID roomId, LocalDateTime beginning, Duration duration, String activityId) throws RoomIdNotFoundException, RoomAlreadyBookedException;
+    boolean bookRoom(UUID roomId, UUID activityId) throws RoomIdNotFoundException, RoomAlreadyBookedException;
 
-    boolean freeRoom(UUID roomId, String activityId);
+    boolean freeRoom(UUID roomId, UUID activityId) throws RoomIdNotFoundException;
 }

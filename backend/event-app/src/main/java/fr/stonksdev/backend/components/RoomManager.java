@@ -1,7 +1,5 @@
 package fr.stonksdev.backend.components;
 
-import fr.stonksdev.backend.entities.Activity;
-import fr.stonksdev.backend.entities.Duration;
 import fr.stonksdev.backend.entities.Room;
 import fr.stonksdev.backend.entities.RoomKind;
 import fr.stonksdev.backend.exceptions.AlreadyExistingRoomException;
@@ -10,71 +8,75 @@ import fr.stonksdev.backend.exceptions.RoomIdNotFoundException;
 import fr.stonksdev.backend.interfaces.RoomBooking;
 import fr.stonksdev.backend.interfaces.RoomModifier;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.time.LocalDateTime;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.UUID;
+import java.util.*;
 
 public class RoomManager implements RoomBooking, RoomModifier {
 
     @Autowired
-    private InMemoryDatabase memory;
+    private InMemoryDatabase inMemoryDatabase;
 
     @Override
-    public boolean bookRoom(UUID roomId, LocalDateTime beginning, Duration duration, String activityId) throws RoomIdNotFoundException, RoomAlreadyBookedException {
-        TreeSet<Activity> activities = memory.getRoomPlanning().get(roomId);
-
-        if (activities != null){
-            //TODO: refactor when activity UUID
-            if (activities.isEmpty()){
-                //memory.
+    public boolean bookRoom(UUID roomId, UUID activityId) throws RoomIdNotFoundException, RoomAlreadyBookedException {
+        boolean bookComplete = true;
+        if(!inMemoryDatabase.getRoomPlanning().isEmpty() && inMemoryDatabase.getRoomPlanning().containsKey(roomId)){
+            List<UUID> activityIdList = inMemoryDatabase.getRoomPlanning().get(roomId);
+            if(activityIdList.contains(activityId)){
+                throw new RoomAlreadyBookedException();
             }
-            if (activities.stream().noneMatch(activity -> activity.getName().equals(activityId))){
-                boolean canBookRoom = true;
-
-                for (Activity activity: activities) {
-
+            if(!inMemoryDatabase.getActivities().containsKey(activityId)){
+                throw new RoomIdNotFoundException();
+            }
+            for (UUID value : activityIdList) {
+                if(inMemoryDatabase.getActivities().get(value).getEndDate().isBefore(inMemoryDatabase.getActivities().get(activityId).getEndDate())){
+                    bookComplete = false;
                 }
             }
         }
-        return false;
-    }
-
-    @Override
-    public boolean freeRoom(UUID roomId, String activityId) {
-        return false;
-    }
-
-    @Override
-    public Room create(String name, RoomKind roomKind, int capacity) throws AlreadyExistingRoomException {
-        if (memory.getRooms().values().stream().noneMatch(room -> room.getName().equals(name))){
-            throw new AlreadyExistingRoomException();
+        if(bookComplete){
+            inMemoryDatabase.getRoomPlanning().get(roomId).add(activityId);
         }
-        Room room = new Room(name, roomKind, capacity);
-        memory.getRooms().put(room.getId(),room);
-        memory.getRoomPlanning().put(room.getId(), new TreeSet<>(new Activity.TimingComparator()));
-        return room;
+        return bookComplete;
+    }
+
+    @Override
+    public boolean freeRoom(UUID roomId, UUID activityId) throws RoomIdNotFoundException {
+        if(!inMemoryDatabase.getRoomPlanning().containsKey(roomId)){
+            throw new RoomIdNotFoundException();
+        }
+        return inMemoryDatabase.getRoomPlanning().get(roomId).remove(activityId);
+    }
+
+    @Override
+    public boolean create(String name, RoomKind roomKind, int capacity) throws AlreadyExistingRoomException {
+        if (!inMemoryDatabase.getRooms().isEmpty()) {
+            for (Map.Entry<UUID, Room> item : inMemoryDatabase.getRooms().entrySet()) {
+                if (item.getValue().getName().equals(name)) {
+                    throw new AlreadyExistingRoomException();
+                }
+            }
+        }
+        Room newRoom = new Room(name,roomKind,capacity);
+        inMemoryDatabase.getRooms().put(newRoom.getId(),newRoom);
+        return true;
     }
 
     @Override
     public boolean modify(UUID roomId, Room newRoom) throws RoomIdNotFoundException{
-        Room room = memory.getRooms().get(roomId);
-        if (room != null){
-            room.setCapacity(newRoom.getCapacity());
-            room.setRoomKind(newRoom.getRoomKind());
-            room.setName(newRoom.getName());
-            return true;
+        if(!inMemoryDatabase.getRooms().containsKey(roomId)){
+            throw new RoomIdNotFoundException();
         }
-        throw new RoomIdNotFoundException();
+        inMemoryDatabase.getRooms().get(roomId).setName(newRoom.getName());
+        inMemoryDatabase.getRooms().get(roomId).setRoomKind(newRoom.getRoomKind());
+        inMemoryDatabase.getRooms().get(roomId).setCapacity(newRoom.getCapacity());
+        return true;
     }
 
     @Override
     public boolean delete(UUID roomId) throws RoomIdNotFoundException{
-        Room room = memory.getRooms().remove(roomId);
-        if(room != null){
-            return true;
+        if(!inMemoryDatabase.getRooms().containsKey(roomId)){
+            throw new RoomIdNotFoundException();
         }
-        throw new RoomIdNotFoundException();
+        inMemoryDatabase.getRooms().remove(roomId);
+        return true;
     }
 }

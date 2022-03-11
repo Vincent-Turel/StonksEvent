@@ -3,7 +3,7 @@ package fr.stonksdev.backend.entities;
 import java.util.UUID;
 
 public class Room extends Place {
-    private UUID id;
+    private final UUID id;
     private String name;
     private RoomKind roomKind;
     private int capacity;
