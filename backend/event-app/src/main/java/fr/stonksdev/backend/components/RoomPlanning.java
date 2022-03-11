@@ -7,12 +7,14 @@ import fr.stonksdev.backend.exceptions.AlreadyExistingRoomException;
 import fr.stonksdev.backend.exceptions.RoomNotFoundException;
 import fr.stonksdev.backend.interfaces.RoomExplorer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@Component
 public class RoomPlanning implements RoomExplorer {
 
     @Autowired

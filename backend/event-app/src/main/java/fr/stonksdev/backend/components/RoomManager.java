@@ -8,8 +8,11 @@ import fr.stonksdev.backend.exceptions.RoomIdNotFoundException;
 import fr.stonksdev.backend.interfaces.RoomBooking;
 import fr.stonksdev.backend.interfaces.RoomModifier;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import java.util.*;
 
+@Component
 public class RoomManager implements RoomBooking, RoomModifier {
 
     @Autowired
