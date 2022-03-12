@@ -1,5 +1,8 @@
 def deploy_module = {
-    sh "mvn -Drepo.id=snapshots -Drepo.login=$REPO_USER -Drepo.pwd=$REPO_USER_PWD -Premote-artefact -pl ${env.MODULE} clean deploy -U"
+    configFileProvider(
+        [configFile(fileId: 'maven-settings', variable: 'MAVEN_SETTINGS')]) {
+            sh "mvn -Drepo.id=snapshots -Drepo.login=$REPO_USER -Drepo.pwd=$REPO_USER_PWD -Premote-artefact -pl ${env.MODULE} -s $MAVEN_SETTINGS clean deploy -U"
+    }
 }
 
 pipeline {
@@ -73,7 +76,10 @@ pipeline {
             }
             steps {
                 dir("${env.WORKSPACE}/backend"){
-                    sh "mvn -Drepo.id=snapshots -Drepo.login=$REPO_USER -Drepo.pwd=$REPO_USER_PWD clean deploy"
+                    configFileProvider(
+                        [configFile(fileId: 'maven-settings', variable: 'MAVEN_SETTINGS')]) {
+                            sh "mvn -Drepo.id=snapshots -Drepo.login=$REPO_USER -Drepo.pwd=$REPO_USER_PWD -s $MAVEN_SETTINGS clean deploy"
+                        }
                 }
                 /*dir("${env.WORKSPACE}/cli"){
                     sh "mvn -Drepo.id=snapshots -Drepo.login=$REPO_USER -Drepo.pwd=$REPO_USER_PWD clean deploy"

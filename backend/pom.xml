@@ -98,4 +98,16 @@
             <url>http://vmpx08.polytech.unice.fr:8016/artifactory/teamh/</url>
         </snapshotRepository>
     </distributionManagement>
+    <profiles>
+        <profile>
+            <id>remote-artefact</id>
+            <repositories>
+                <repository>
+                    <id>snapshots</id>
+                    <name>local-artifactory</name>
+                    <url>http://vmpx08.polytech.unice.fr:8016/artifactory/teamh/</url>
+                </repository>
+            </repositories>
+        </profile>
+    </profiles>
 </project>
