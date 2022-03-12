@@ -48,7 +48,9 @@ pipeline {
             }
             steps {
                 echo "Building entities develop"
-                script { deploy_module() }
+                dir("${env.WORKSPACE}/backend"){
+                    script { deploy_module() }
+                }
             }
         }
         stage('Build event-app - dev') {
@@ -60,7 +62,9 @@ pipeline {
             }
             steps {
                 echo "Building event-app develop"
-                script { deploy_module() }
+                dir("${env.WORKSPACE}/backend"){
+                    script { deploy_module() }
+                }
             }
         }
         stage('Build all') {
@@ -68,7 +72,12 @@ pipeline {
                 expression { env.BRANCH_NAME == 'main' }
             }
             steps {
-                sh "mvn -Drepo.id=snapshots -Drepo.login=$REPO_USER -Drepo.pwd=$REPO_USER_PWD clean deploy"
+                dir("${env.WORKSPACE}/backend"){
+                    sh "mvn -Drepo.id=snapshots -Drepo.login=$REPO_USER -Drepo.pwd=$REPO_USER_PWD clean deploy"
+                }
+                /*dir("${env.WORKSPACE}/cli"){
+                    sh "mvn -Drepo.id=snapshots -Drepo.login=$REPO_USER -Drepo.pwd=$REPO_USER_PWD clean deploy"
+                }*/
             }
         }
      }
