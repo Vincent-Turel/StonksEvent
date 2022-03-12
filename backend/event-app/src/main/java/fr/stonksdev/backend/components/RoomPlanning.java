@@ -38,24 +38,33 @@ public class RoomPlanning implements RoomExplorer {
     }
 
     private UUID finder(RoomKind roomKind, LocalDateTime beginning, Duration duration, int minCapacity) throws RoomNotFoundException{
+        UUID find = null;
+        int size = -1;
         if(!inMemoryDatabase.getRooms().isEmpty()){
             for (Map.Entry<UUID, Room> item : inMemoryDatabase.getRooms().entrySet()) {
-                if (checkRoomKind(item,roomKind) && item.getValue().getCapacity()==minCapacity) {
+                if (checkRoomKind(item,roomKind) && item.getValue().getCapacity()>=minCapacity && (size==-1 || size>item.getValue().getCapacity())) {
                     List<UUID> listActivity = inMemoryDatabase.getRoomPlanning().get(item.getKey());
-                    if(listActivity.isEmpty()){
-                        return item.getKey();
+                    if(listActivity==null || listActivity.isEmpty()){
+                        size = item.getValue().getCapacity();
+                        find = item.getKey();
                     }
-                    boolean isFree = true;
-                    for(UUID value: listActivity){
-                        if(inMemoryDatabase.getActivities().get(value).getEndDate().isAfter(beginning.plusMinutes(duration.asMinutes()))){
-                            isFree = false;
+                    else{
+                        boolean isFree = true;
+                        for(UUID value: listActivity){
+                            if(inMemoryDatabase.getActivities().get(value).getEndDate().isAfter(beginning.plusMinutes(duration.asMinutes()))){
+                                isFree = false;
+                            }
                         }
-                    }
-                    if(isFree){
-                        return item.getKey();
+                        if(isFree){
+                            size = item.getValue().getCapacity();
+                            find = item.getKey();
+                        }
                     }
                 }
             }
+        }
+        if(size!=-1 && find!=null){
+            return find;
         }
         throw new RoomNotFoundException();
     }

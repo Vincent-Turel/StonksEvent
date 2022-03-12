@@ -82,4 +82,9 @@ public class RoomManager implements RoomBooking, RoomModifier {
         inMemoryDatabase.getRooms().remove(roomId);
         return true;
     }
+
+    public void reset(){
+        inMemoryDatabase.getRoomPlanning().clear();
+        inMemoryDatabase.getRooms().clear();
+    }
 }
