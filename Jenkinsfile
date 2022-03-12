@@ -1,5 +1,5 @@
 def deploy_module = {
-    sh "mvn -Drepo.id=snapshots -Drepo.login=$REPO_USER -Drepo.pwd=$REPO_USER_PWD -Premote-artefact -pl ${env.MODULE} clean deploy -U"
+    sh 'mvn -Drepo.id=snapshots -Drepo.login=$REPO_USER -Drepo.pwd=$REPO_USER_PWD -Premote-artefact -pl ${env.MODULE} clean deploy -U'
 }
 
 pipeline {
@@ -67,7 +67,7 @@ pipeline {
                 expression { env.BRANCH_NAME == 'main' }
             }
             steps {
-                sh "mvn -Drepo.id=snapshots -Drepo.login=$REPO_USER -Drepo.pwd=$REPO_USER_PWD clean deploy"
+                sh 'mvn -Drepo.id=snapshots -Drepo.login=$REPO_USER -Drepo.pwd=$REPO_USER_PWD clean deploy'
             }
         }
      }
