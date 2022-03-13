@@ -2,6 +2,7 @@ package fr.stonksdev.backend.components;
 
 import fr.stonksdev.backend.entities.Room;
 import fr.stonksdev.backend.entities.RoomKind;
+import fr.stonksdev.backend.exceptions.ActivityNotFoundException;
 import fr.stonksdev.backend.exceptions.AlreadyExistingRoomException;
 import fr.stonksdev.backend.exceptions.RoomAlreadyBookedException;
 import fr.stonksdev.backend.exceptions.RoomIdNotFoundException;
@@ -21,26 +22,36 @@ public class RoomManager implements RoomBooking, RoomModifier {
     private final List<UUID> listRoomId = new ArrayList<>();
 
     @Override
-    public boolean bookRoom(UUID roomId, UUID activityId) throws RoomIdNotFoundException, RoomAlreadyBookedException {
+    public boolean bookRoom(UUID roomId, UUID activityId) throws ActivityNotFoundException, RoomAlreadyBookedException {
         boolean bookComplete = true;
-        if(!inMemoryDatabase.getRoomPlanning().isEmpty() && inMemoryDatabase.getRoomPlanning().containsKey(roomId)){
+
+        if(!inMemoryDatabase.getRoomPlanning().containsKey(roomId)){
+            List<UUID> newList = new ArrayList<>();
+            inMemoryDatabase.getRoomPlanning().put(roomId,newList);
+        }
+
+        if(!inMemoryDatabase.getRoomPlanning().isEmpty()){
             List<UUID> activityIdList = inMemoryDatabase.getRoomPlanning().get(roomId);
             if(activityIdList.contains(activityId)){
                 throw new RoomAlreadyBookedException();
             }
             if(!inMemoryDatabase.getActivities().containsKey(activityId)){
-                throw new RoomIdNotFoundException();
+                throw new ActivityNotFoundException();
             }
             for (UUID value : activityIdList) {
-                if(inMemoryDatabase.getActivities().get(value).getEndDate().isBefore(inMemoryDatabase.getActivities().get(activityId).getEndDate())){
+                if(!inMemoryDatabase.getActivities().get(value).getEndDate().isBefore(inMemoryDatabase.getActivities().get(activityId).getBeginning())){
                     bookComplete = false;
                 }
             }
         }
+
         if(bookComplete){
             inMemoryDatabase.getRoomPlanning().get(roomId).add(activityId);
+            return bookComplete;
         }
-        return bookComplete;
+        else {
+            throw new RoomAlreadyBookedException();
+        }
     }
 
     @Override
