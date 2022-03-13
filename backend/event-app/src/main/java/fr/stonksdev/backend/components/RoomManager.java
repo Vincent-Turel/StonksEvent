@@ -18,6 +18,8 @@ public class RoomManager implements RoomBooking, RoomModifier {
     @Autowired
     private InMemoryDatabase inMemoryDatabase;
 
+    private final List<UUID> listRoomId = new ArrayList<>();
+
     @Override
     public boolean bookRoom(UUID roomId, UUID activityId) throws RoomIdNotFoundException, RoomAlreadyBookedException {
         boolean bookComplete = true;
@@ -60,6 +62,7 @@ public class RoomManager implements RoomBooking, RoomModifier {
         }
         Room newRoom = new Room(name,roomKind,capacity);
         inMemoryDatabase.getRooms().put(newRoom.getId(),newRoom);
+        listRoomId.add(newRoom.getId());
         return true;
     }
 
@@ -79,11 +82,17 @@ public class RoomManager implements RoomBooking, RoomModifier {
         if(!inMemoryDatabase.getRooms().containsKey(roomId)){
             throw new RoomIdNotFoundException();
         }
+        listRoomId.remove(roomId);
         inMemoryDatabase.getRooms().remove(roomId);
         return true;
     }
 
+    public List<UUID> getListRoomId(){
+        return listRoomId;
+    }
+
     public void reset(){
+        listRoomId.clear();
         inMemoryDatabase.getRoomPlanning().clear();
         inMemoryDatabase.getRooms().clear();
     }

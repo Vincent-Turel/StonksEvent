@@ -3,6 +3,7 @@ package fr.stonksdev.backend.entities;
 public enum RoomKind {
     Amphitheatre,
     Demonstration,
+    Classroom,
     Lunch,
     Meeting,
     Speciality
