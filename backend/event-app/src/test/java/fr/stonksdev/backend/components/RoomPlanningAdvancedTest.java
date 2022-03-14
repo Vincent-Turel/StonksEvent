@@ -34,29 +34,29 @@ public class RoomPlanningAdvancedTest {
     void setup() throws AlreadyExistingRoomException, RoomAlreadyBookedException, ActivityNotFoundException {
         activityManager.reset();
         roomManager.reset();
-        roomManager.create("Salle 101", RoomKind.Classroom,30);
+        roomManager.create("Salle 101", RoomKind.Classroom, 30);
         roomManager.create("Salle 102", RoomKind.Classroom, 50);
-        roomManager.create("AmphiOuest",RoomKind.Amphitheatre,150);
-        activityManager.createEvent("PanicCode",150,LocalDateTime.of(2022,1,15,8,0),LocalDateTime.of(2022,1,30,15,0));
-        activityManager.createActivity(LocalDateTime.of(2022,1,15,15,0), Duration.ofMinutes(120),"CodeTime", 50,activityManager.getEventIdList().get(0));
-        activityManager.createActivity(LocalDateTime.of(2022,1,15,15,0),Duration.ofMinutes(240),"Codex",20,activityManager.getEventIdList().get(0));
-        roomManager.bookRoom(roomManager.getListRoomId().get(1),activityManager.getActivitiesId().get(0));
-        roomManager.bookRoom(roomManager.getListRoomId().get(0),activityManager.getActivitiesId().get(1));
+        roomManager.create("AmphiOuest", RoomKind.Amphitheatre, 150);
+        activityManager.createEvent("PanicCode", 150, LocalDateTime.of(2022, 1, 15, 8, 0), LocalDateTime.of(2022, 1, 30, 15, 0));
+        activityManager.createActivity(LocalDateTime.of(2022, 1, 15, 15, 0), Duration.ofMinutes(120), "CodeTime", 50, activityManager.getEventIdList().get(0));
+        activityManager.createActivity(LocalDateTime.of(2022, 1, 15, 15, 0), Duration.ofMinutes(240), "Codex", 20, activityManager.getEventIdList().get(0));
+        roomManager.bookRoom(roomManager.getListRoomId().get(1), activityManager.getActivitiesId().get(0));
+        roomManager.bookRoom(roomManager.getListRoomId().get(0), activityManager.getActivitiesId().get(1));
     }
 
     @Test
     public void searchFreeRoomAdvancedTest() throws RoomNotFoundException {
-        activityManager.createActivity(LocalDateTime.of(2022,1,15,17,0),Duration.ofMinutes(120),"Test",20, activityManager.getEventIdList().get(0));
+        activityManager.createActivity(LocalDateTime.of(2022, 1, 15, 17, 0), Duration.ofMinutes(120), "Test", 20, activityManager.getEventIdList().get(0));
         UUID id = planning.searchFreeRoom(activityManager.getAnActivity(activityManager.getActivitiesId().get(2)).getBeginning(),
                 activityManager.getAnActivity(activityManager.getActivitiesId().get(2)).getDuration(),
                 activityManager.getAnActivity(activityManager.getActivitiesId().get(2)).getMaxPeopleAmount());
-        assertEquals("Salle 102",inMemoryDatabase.getRooms().get(id).getName());
+        assertEquals("Salle 102", inMemoryDatabase.getRooms().get(id).getName());
     }
 
     @Test
-    public void searchFreeRoomAdvancedTestException(){
+    public void searchFreeRoomAdvancedTestException() {
         RoomNotFoundException thrown = assertThrows(RoomNotFoundException.class, () -> {
-            activityManager.createActivity(LocalDateTime.of(2022,1,15,15,0), Duration.ofMinutes(120),"Exception", 50,activityManager.getEventIdList().get(0));
+            activityManager.createActivity(LocalDateTime.of(2022, 1, 15, 15, 0), Duration.ofMinutes(120), "Exception", 50, activityManager.getEventIdList().get(0));
             UUID id = planning.searchFreeRoom(RoomKind.Classroom,
                     activityManager.getAnActivity(activityManager.getActivitiesId().get(2)).getBeginning(),
                     activityManager.getAnActivity(activityManager.getActivitiesId().get(2)).getDuration(),

@@ -31,7 +31,7 @@ public class RoomManagerAvancedTest {
         manager.reset();
         activityManager.reset();
         manager.create("Salle 103", RoomKind.Classroom,30);
-        activityManager.createEvent("Stonks",200,null,null);
+        activityManager.createEvent("Stonks",200,LocalDateTime.of(2022,1,1,1,0),LocalDateTime.of(2022,1,1,5,0));
         activityManager.createActivity(LocalDateTime.of(2022,1,15,15,0), Duration.ofMinutes(120),"BonbonDrop",20,activityManager.getEventIdList().get(0));
         manager.bookRoom(manager.getListRoomId().get(0),activityManager.getActivitiesId().get(0));
     }

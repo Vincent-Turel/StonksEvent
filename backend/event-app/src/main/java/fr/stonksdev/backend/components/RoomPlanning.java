@@ -22,40 +22,39 @@ public class RoomPlanning implements RoomExplorer {
 
     @Override
     public UUID searchFreeRoom(RoomKind roomKind, LocalDateTime beginning, Duration duration, int minCapacity) throws RoomNotFoundException {
-        return finder(roomKind,beginning,duration,minCapacity);
+        return finder(roomKind, beginning, duration, minCapacity);
     }
 
     @Override
     public UUID searchFreeRoom(LocalDateTime beginning, Duration duration, int minCapacity) throws RoomNotFoundException {
-        return finder(null,beginning,duration,minCapacity);
+        return finder(null, beginning, duration, minCapacity);
     }
 
-    private boolean checkRoomKind(Map.Entry<UUID, Room> item,RoomKind roomKind){
-        if(roomKind==null){
+    private boolean checkRoomKind(Map.Entry<UUID, Room> item, RoomKind roomKind) {
+        if (roomKind == null) {
             return true;
         }
         return item.getValue().getRoomKind().equals(roomKind);
     }
 
-    private UUID finder(RoomKind roomKind, LocalDateTime beginning, Duration duration, int minCapacity) throws RoomNotFoundException{
+    private UUID finder(RoomKind roomKind, LocalDateTime beginning, Duration duration, int minCapacity) throws RoomNotFoundException {
         UUID find = null;
         int size = -1;
-        if(!inMemoryDatabase.getRooms().isEmpty()){
+        if (!inMemoryDatabase.getRooms().isEmpty()) {
             for (Map.Entry<UUID, Room> item : inMemoryDatabase.getRooms().entrySet()) {
-                if (checkRoomKind(item,roomKind) && item.getValue().getCapacity()>=minCapacity && (size==-1 || size>item.getValue().getCapacity())) {
+                if (checkRoomKind(item, roomKind) && item.getValue().getCapacity() >= minCapacity && (size == -1 || size > item.getValue().getCapacity())) {
                     List<UUID> listActivity = inMemoryDatabase.getRoomPlanning().get(item.getKey());
-                    if(listActivity==null || listActivity.isEmpty()){
+                    if (listActivity == null || listActivity.isEmpty()) {
                         size = item.getValue().getCapacity();
                         find = item.getKey();
-                    }
-                    else{
+                    } else {
                         boolean isFree = true;
-                        for(UUID value: listActivity){
-                            if(inMemoryDatabase.getActivities().get(value).getEndDate().isAfter(beginning)){
+                        for (UUID value : listActivity) {
+                            if (inMemoryDatabase.getActivities().get(value).getEndDate().isAfter(beginning)) {
                                 isFree = false;
                             }
                         }
-                        if(isFree){
+                        if (isFree) {
                             size = item.getValue().getCapacity();
                             find = item.getKey();
                         }
@@ -63,17 +62,17 @@ public class RoomPlanning implements RoomExplorer {
                 }
             }
         }
-        if(size!=-1 && find!=null){
+        if (size != -1 && find != null) {
             return find;
         }
         throw new RoomNotFoundException();
     }
 
     @Override
-    public UUID searchRoom(String name) throws RoomNotFoundException{
-        if(!inMemoryDatabase.getRooms().isEmpty()){
+    public UUID searchRoom(String name) throws RoomNotFoundException {
+        if (!inMemoryDatabase.getRooms().isEmpty()) {
             for (Map.Entry<UUID, Room> item : inMemoryDatabase.getRooms().entrySet()) {
-                if(item.getValue().getName().equals(name)){
+                if (item.getValue().getName().equals(name)) {
                     return item.getKey();
                 }
             }
