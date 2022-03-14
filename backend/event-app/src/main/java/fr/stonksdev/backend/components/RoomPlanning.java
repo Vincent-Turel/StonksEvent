@@ -51,7 +51,7 @@ public class RoomPlanning implements RoomExplorer {
                     else{
                         boolean isFree = true;
                         for(UUID value: listActivity){
-                            if(inMemoryDatabase.getActivities().get(value).getEndDate().isAfter(beginning.plusMinutes(duration.asMinutes()))){
+                            if(inMemoryDatabase.getActivities().get(value).getEndDate().isAfter(beginning)){
                                 isFree = false;
                             }
                         }
