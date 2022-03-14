@@ -10,6 +10,10 @@ import java.util.*;
 @Component
 public class InMemoryDatabase {
 
+    /*
+    A faire : rajouté un map de type <room -> son id> on verra ça après la soutenance 
+     */
+
     private Map<UUID, StonksEvent> events;
 
     public Map<UUID, StonksEvent> getEvents() {
@@ -22,10 +26,17 @@ public class InMemoryDatabase {
         return activities;
     }
 
-    private Map<Room, Set<Activity>> rooms;
+    private Map<UUID, Room> rooms;
 
-    public Map<Room, Set<Activity>> getRooms() {
+    public Map<UUID, Room> getRooms() {
         return rooms;
+    }
+
+    //roomID -> List of activityId for the corresponding room
+    private Map<UUID, List<UUID>> roomPlanning;
+
+    public Map<UUID, List<UUID>> getRoomPlanning() {
+        return roomPlanning;
     }
 
     public InMemoryDatabase() {
@@ -36,5 +47,6 @@ public class InMemoryDatabase {
         events = new HashMap<>();
         activities = new HashMap<>();
         rooms = new HashMap<>();
+        roomPlanning = new HashMap<>();
     }
 }

@@ -1,6 +1,7 @@
 package fr.stonksdev.backend.entities;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -41,6 +42,10 @@ public class Activity {
         this.maxPeopleAmount = 9999;
         this.eventUUID = eventUUID;
         this.activityID = UUID.randomUUID();
+    }
+
+    public LocalDateTime getEndDate(){
+        return beginning.plusMinutes(duration.asMinutes());
     }
 
     public LocalDateTime getBeginning() {
