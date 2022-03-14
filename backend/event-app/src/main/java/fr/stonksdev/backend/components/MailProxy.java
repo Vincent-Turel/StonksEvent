@@ -15,8 +15,8 @@ public class MailProxy implements Mail {
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Override
-    public boolean send(String recipient, String object, String content) {
-        int result = restTemplate.postForObject(mailUri + "/send", new MailDTO(recipient, object, content), Integer.class);
+    public boolean send(String recipient, String subject, String content) {
+        int result = restTemplate.postForObject(mailUri + "/send", new MailDTO(recipient, subject, content), Integer.class);
         return result == 0;
     }
 }

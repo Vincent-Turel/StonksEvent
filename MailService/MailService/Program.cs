@@ -1,11 +1,16 @@
 ﻿using System.Net;
 using System.Net.Mail;
 using System.Text;
-
-
+using System.Text.Json;
 
 namespace BasicServerHTTPlistener
 {
+    internal class Mail
+    {
+        public string recipient { get; set; }
+        public string subject { get; set; } 
+        public string body { get; set; }
+    }
     enum Status
     {
         OK,
@@ -17,7 +22,6 @@ namespace BasicServerHTTPlistener
         {
             Server server = new Server();
             server.Start("http://localhost:9090/");
-
         }
 
     }
@@ -63,11 +67,7 @@ namespace BasicServerHTTPlistener
             {
                 // Note: The GetContext method blocks while waiting for a request.
                 HttpListenerContext context = listener.GetContext();
-                if (!Terminate)
-                {
-                    ProcessRequest(context);
-                    Console.WriteLine("Processing request");
-                }
+                ProcessRequest(context);
             }
         }
 
@@ -117,28 +117,43 @@ namespace BasicServerHTTPlistener
                     }
                 }
 
-                Console.WriteLine(documentContents);
-
                 HttpListenerResponse response = context.Response;
-
-                var smtpClient = new SmtpClient("smtp.gmail.com")
-                {
-                    Port = 587,
-                    Credentials = new NetworkCredential("stonksdev.polyevent@gmail.com", "rpuzwenzijatkrfm"),
-                    EnableSsl = true,
-                };
-
                 Status result = Status.OK;
 
-                try
+                Console.WriteLine(documentContents);
+
+                Mail? mail = JsonSerializer.Deserialize<Mail>(documentContents);
+
+                if (Terminate)
                 {
-                    smtpClient.Send("stonksdev.polyevent@gmail.com", "vincetl74@gmail.com", "object", documentContents);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Exception caught while sending the mail: {0}", ex.ToString());
+                    Console.WriteLine("Request not processed. Web server has been unactivated. Press space bar to reactivate it.");
                     result = Status.Failed;
-                    
+
+                }
+                else if (mail is null)
+                {
+                    Console.WriteLine("Failed to deserialize the mail...");
+                    result = Status.Failed;
+                } else
+                {
+                    var smtpClient = new SmtpClient("smtp.gmail.com")
+                    {
+                        Port = 587,
+                        Credentials = new NetworkCredential("stonksdev.polyevent@gmail.com", "rpuzwenzijatkrfm"),
+                        EnableSsl = true,
+                    };
+
+
+                    try
+                    {
+                        smtpClient.Send("stonksdev.polyevent@gmail.com", mail.recipient, mail.subject, mail.body);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Exception caught while sending the mail: {0}", ex.ToString());
+                        result = Status.Failed;
+
+                    }
                 }
 
                 byte[] buffer = System.Text.Encoding.UTF8.GetBytes(result.ToString());

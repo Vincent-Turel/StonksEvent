@@ -2,12 +2,12 @@ package fr.stonksdev.backend.controllers.dto;
 
 public class MailDTO {
     private String recipient;
-    private String object;
+    private String subject;
     private String body;
 
-    public MailDTO(String recipient, String object, String body) {
+    public MailDTO(String recipient, String subject, String body) {
         this.recipient = recipient;
-        this.object = object;
+        this.subject = subject;
         this.body = body;
     }
 
@@ -15,8 +15,8 @@ public class MailDTO {
         return recipient;
     }
 
-    public String getObject() {
-        return object;
+    public String getSubject() {
+        return subject;
     }
 
     public String getBody() {
