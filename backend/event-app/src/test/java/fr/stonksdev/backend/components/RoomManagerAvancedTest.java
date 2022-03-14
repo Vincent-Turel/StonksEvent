@@ -30,23 +30,23 @@ public class RoomManagerAvancedTest {
     void setup() throws AlreadyExistingRoomException, RoomAlreadyBookedException, ActivityNotFoundException {
         manager.reset();
         activityManager.reset();
-        manager.create("Salle 103", RoomKind.Classroom,30);
-        activityManager.createEvent("Stonks",200,LocalDateTime.of(2022,1,1,1,0),LocalDateTime.of(2022,1,1,5,0));
-        activityManager.createActivity(LocalDateTime.of(2022,1,15,15,0), Duration.ofMinutes(120),"BonbonDrop",20,activityManager.getEventIdList().get(0));
-        manager.bookRoom(manager.getListRoomId().get(0),activityManager.getActivitiesId().get(0));
+        manager.create("Salle 103", RoomKind.Classroom, 30);
+        activityManager.createEvent("Stonks", 200, LocalDateTime.of(2022, 1, 1, 1, 0), LocalDateTime.of(2022, 1, 1, 5, 0));
+        activityManager.createActivity(LocalDateTime.of(2022, 1, 15, 15, 0), Duration.ofMinutes(120), "BonbonDrop", 20, activityManager.getEventIdList().get(0));
+        manager.bookRoom(manager.getListRoomId().get(0), activityManager.getActivitiesId().get(0));
     }
 
     @Test
     void bookRoomTest() throws RoomAlreadyBookedException, ActivityNotFoundException {
-        assertEquals(1,inMemoryDatabase.getRoomPlanning().size());
-        assertEquals("BonbonDrop",inMemoryDatabase.getActivities().get(inMemoryDatabase.getRoomPlanning().get(manager.getListRoomId().get(0)).get(0)).getName());
+        assertEquals(1, inMemoryDatabase.getRoomPlanning().size());
+        assertEquals("BonbonDrop", inMemoryDatabase.getActivities().get(inMemoryDatabase.getRoomPlanning().get(manager.getListRoomId().get(0)).get(0)).getName());
     }
 
     @Test
-    void roomAlreadyBookedExceptionTest(){
+    void roomAlreadyBookedExceptionTest() {
         RoomAlreadyBookedException thrown = assertThrows(RoomAlreadyBookedException.class, () -> {
-            activityManager.createActivity(LocalDateTime.of(2022,1,15,15,0), Duration.ofMinutes(120),"BonbonDropNext",30,activityManager.getEventIdList().get(0));
-            manager.bookRoom(manager.getListRoomId().get(0),activityManager.getActivitiesId().get(1));
+            activityManager.createActivity(LocalDateTime.of(2022, 1, 15, 15, 0), Duration.ofMinutes(120), "BonbonDropNext", 30, activityManager.getEventIdList().get(0));
+            manager.bookRoom(manager.getListRoomId().get(0), activityManager.getActivitiesId().get(1));
         });
         assertEquals(RoomAlreadyBookedException.class, thrown.getClass());
     }
@@ -54,6 +54,6 @@ public class RoomManagerAvancedTest {
     @Test
     void freeRoomTest() throws RoomIdNotFoundException {
         manager.freeRoom(manager.getListRoomId().get(0), activityManager.getActivitiesId().get(0));
-        assertEquals(0,inMemoryDatabase.getRoomPlanning().get(manager.getListRoomId().get(0)).size());
+        assertEquals(0, inMemoryDatabase.getRoomPlanning().get(manager.getListRoomId().get(0)).size());
     }
 }
