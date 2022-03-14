@@ -10,6 +10,10 @@ import java.util.*;
 @Component
 public class InMemoryDatabase {
 
+    /*
+    A faire : rajouté un map de type <room -> son id> on verra ça après la soutenance 
+     */
+
     private Map<UUID, StonksEvent> events;
 
     public Map<UUID, StonksEvent> getEvents() {
