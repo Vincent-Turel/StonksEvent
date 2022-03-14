@@ -82,9 +82,10 @@ public class RoomManager implements RoomBooking, RoomModifier {
         if(!inMemoryDatabase.getRooms().containsKey(roomId)){
             throw new RoomIdNotFoundException();
         }
-        inMemoryDatabase.getRooms().get(roomId).setName(newRoom.getName());
-        inMemoryDatabase.getRooms().get(roomId).setRoomKind(newRoom.getRoomKind());
-        inMemoryDatabase.getRooms().get(roomId).setCapacity(newRoom.getCapacity());
+        Room room = inMemoryDatabase.getRooms().get(roomId);
+        room.setName(newRoom.getName());
+        room.setRoomKind(newRoom.getRoomKind());
+        room.setCapacity(newRoom.getCapacity());
         return true;
     }
 
