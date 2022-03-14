@@ -13,6 +13,7 @@ import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @Component
@@ -23,22 +24,22 @@ public class RoomPlanning implements RoomExplorer {
 
     @Override
     public UUID searchFreeRoom(RoomKind roomKind, LocalDateTime beginning, Duration duration, int minCapacity) throws RoomNotFoundException {
-        return finder(roomKind, beginning, duration, minCapacity);
+        return finder(Optional.of(roomKind), beginning, duration, minCapacity);
     }
 
     @Override
     public UUID searchFreeRoom(LocalDateTime beginning, Duration duration, int minCapacity) throws RoomNotFoundException {
-        return finder(null, beginning, duration, minCapacity);
+        return finder(Optional.empty(),beginning, duration, minCapacity);
     }
 
-    private boolean checkRoomKind(Map.Entry<UUID, Room> item, RoomKind roomKind) {
-        if (roomKind == null) {
+    private boolean checkRoomKind(Map.Entry<UUID, Room> item, Optional<RoomKind> roomKind) {
+        if (roomKind.isEmpty()) {
             return true;
         }
-        return item.getValue().getRoomKind().equals(roomKind);
+        return item.getValue().getRoomKind().equals(roomKind.get());
     }
 
-    private UUID finder(RoomKind roomKind, LocalDateTime beginning, Duration duration, int minCapacity) throws RoomNotFoundException {
+    private UUID finder(Optional<RoomKind> roomKind, LocalDateTime beginning, Duration duration, int minCapacity) throws RoomNotFoundException {
         UUID find = null;
         int size = -1;
         if (!inMemoryDatabase.getRooms().isEmpty()) {
