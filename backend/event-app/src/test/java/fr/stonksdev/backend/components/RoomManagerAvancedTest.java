@@ -6,15 +6,19 @@ import fr.stonksdev.backend.exceptions.ActivityNotFoundException;
 import fr.stonksdev.backend.exceptions.AlreadyExistingRoomException;
 import fr.stonksdev.backend.exceptions.RoomAlreadyBookedException;
 import fr.stonksdev.backend.exceptions.RoomIdNotFoundException;
+import fr.stonksdev.backend.interfaces.Mail;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 public class RoomManagerAvancedTest {
@@ -25,9 +29,13 @@ public class RoomManagerAvancedTest {
     private RoomManager manager;
     @Autowired
     private StonksEventManager activityManager;
+    @MockBean
+    Mail mailMock;
 
     @BeforeEach
     void setup() throws AlreadyExistingRoomException, RoomAlreadyBookedException, ActivityNotFoundException {
+        when(mailMock.send(anyString(),anyString(), anyString())).thenReturn(true);
+
         manager.reset();
         activityManager.reset();
         manager.create("Salle 103", RoomKind.Classroom, 30);

@@ -12,7 +12,7 @@ import java.time.Duration;
 @SpringBootApplication
 public class CliApplication {
 
-    @Value("${http://localhost:8080}")
+    @Value("${stonksevent.host.baseurl}")
     private String serverHostandPort;
 
     public static void main(String[] args) {
