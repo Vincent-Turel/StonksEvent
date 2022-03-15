@@ -2,6 +2,8 @@ package fr.stonksdev.backend.components;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 import fr.stonksdev.backend.entities.Duration;
 import fr.stonksdev.backend.entities.Room;
@@ -10,10 +12,12 @@ import fr.stonksdev.backend.exceptions.ActivityNotFoundException;
 import fr.stonksdev.backend.exceptions.AlreadyExistingRoomException;
 import fr.stonksdev.backend.exceptions.RoomAlreadyBookedException;
 import fr.stonksdev.backend.exceptions.RoomNotFoundException;
+import fr.stonksdev.backend.interfaces.Mail;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -29,9 +33,13 @@ public class RoomPlanningAdvancedTest {
     private StonksEventManager activityManager;
     @Autowired
     private RoomPlanning planning;
+    @MockBean
+    private Mail mailMock;
 
     @BeforeEach
     void setup() throws AlreadyExistingRoomException, RoomAlreadyBookedException, ActivityNotFoundException {
+        when(mailMock.send(anyString(),anyString(), anyString())).thenReturn(true);
+
         activityManager.reset();
         roomManager.reset();
         roomManager.create("Salle 101", RoomKind.Classroom, 30);
