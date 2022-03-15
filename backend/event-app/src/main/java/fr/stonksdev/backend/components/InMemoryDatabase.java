@@ -26,6 +26,13 @@ public class InMemoryDatabase {
         return activities;
     }
 
+
+    private Map<UUID, Set<Activity>> eventActivityAssociation;
+
+    public Map<UUID, Set<Activity>> getEventActivityAssociation() {
+        return eventActivityAssociation;
+    }
+
     private Map<UUID, Room> rooms;
 
     public Map<UUID, Room> getRooms() {
@@ -46,6 +53,7 @@ public class InMemoryDatabase {
     public void flush() {
         events = new HashMap<>();
         activities = new HashMap<>();
+        eventActivityAssociation = new HashMap<>();
         rooms = new HashMap<>();
         roomPlanning = new HashMap<>();
     }

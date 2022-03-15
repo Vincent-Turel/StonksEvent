@@ -1,10 +1,12 @@
 package fr.stonksdev.cli;
 
+import fr.stonksdev.cli.model.Activity;
 import fr.stonksdev.cli.model.StonksEvent;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
@@ -15,8 +17,15 @@ public class CliContext {
         return events;
     }
 
+    private Map<String, Activity> activities;
+
+    public Map<String, Activity> getActivities() {
+        return activities;
+    }
+
     public CliContext() {
         events = new HashMap<>();
+        activities = new HashMap<>();
     }
 
     @Override

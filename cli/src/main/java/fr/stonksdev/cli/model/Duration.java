@@ -1,6 +1,8 @@
-package fr.stonksdev.backend.entities;
+package fr.stonksdev.cli.model;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
 

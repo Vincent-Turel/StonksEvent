@@ -2,10 +2,7 @@ package fr.stonksdev.backend.components;
 
 import fr.stonksdev.backend.entities.Duration;
 import fr.stonksdev.backend.entities.RoomKind;
-import fr.stonksdev.backend.exceptions.ActivityNotFoundException;
-import fr.stonksdev.backend.exceptions.AlreadyExistingRoomException;
-import fr.stonksdev.backend.exceptions.RoomAlreadyBookedException;
-import fr.stonksdev.backend.exceptions.RoomIdNotFoundException;
+import fr.stonksdev.backend.exceptions.*;
 import fr.stonksdev.backend.interfaces.Mail;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,7 +30,7 @@ public class RoomManagerAvancedTest {
     Mail mailMock;
 
     @BeforeEach
-    void setup() throws AlreadyExistingRoomException, RoomAlreadyBookedException, ActivityNotFoundException {
+    void setup() throws AlreadyExistingRoomException, RoomAlreadyBookedException, ActivityNotFoundException, AlreadyExistingEventException {
         when(mailMock.send(anyString(),anyString(), anyString())).thenReturn(true);
 
         manager.reset();

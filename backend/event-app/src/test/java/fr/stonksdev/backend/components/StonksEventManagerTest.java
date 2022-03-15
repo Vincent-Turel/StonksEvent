@@ -1,6 +1,9 @@
 package fr.stonksdev.backend.components;
 
 import fr.stonksdev.backend.entities.Duration;
+import fr.stonksdev.backend.entities.StonksEvent;
+import fr.stonksdev.backend.exceptions.AlreadyExistingEventException;
+import fr.stonksdev.backend.exceptions.EventIdNotFoundException;
 import fr.stonksdev.backend.interfaces.Mail;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
@@ -31,7 +35,7 @@ public class StonksEventManagerTest {
     private final Duration duration_1 = Duration.ofMinutes(120);
 
     @BeforeEach
-    void setup() {
+    void setup() throws AlreadyExistingEventException {
         when(mailMock.send(anyString(),anyString(), anyString())).thenReturn(true);
 
         manager.reset();
@@ -40,7 +44,7 @@ public class StonksEventManagerTest {
     }
 
     @Test
-    void createEventTest() {
+    void createEventTest() throws EventIdNotFoundException {
         assertEquals(2, manager.getAllEvent().size());
         //EVENT 1:
         assertEquals("StonksEvent", manager.getAnEvent(manager.getEventIdList().get(0)).getName());
@@ -55,27 +59,22 @@ public class StonksEventManagerTest {
     }
 
     @Test
-    void setNewEventNameTest() {
-        assertEquals("StonksEvent", manager.getAnEvent(manager.getEventIdList().get(0)).getName());
-        assertEquals("CrazyGame", manager.getAnEvent(manager.getEventIdList().get(1)).getName());
-        manager.setNewEventName("MagicalFurry", manager.getEventIdList().get(0));
-        manager.setNewEventName("JapanExpo", manager.getEventIdList().get(1));
-        assertEquals("MagicalFurry", manager.getAnEvent(manager.getEventIdList().get(0)).getName());
-        assertEquals("JapanExpo", manager.getAnEvent(manager.getEventIdList().get(1)).getName());
+    void updateEventTest() throws EventIdNotFoundException {
+        StonksEvent event_1 = manager.getAnEvent(manager.getEventIdList().get(0));
+        StonksEvent event_2 = manager.getAnEvent(manager.getEventIdList().get(1));
+        assertEquals("StonksEvent", event_1.getName());
+        assertEquals(100, event_1.getAmountOfPeople());
+        assertEquals(date_1, event_1.getStartDate());
+        assertEquals(date_2, event_1.getEndDate());
+        manager.updateEvent(event_1.getId(), event_2.getAmountOfPeople(), event_2.getStartDate(), event_2.getEndDate());
+        assertEquals("StonksEvent", event_1.getName());
+        assertEquals(event_2.getAmountOfPeople(), event_1.getAmountOfPeople());
+        assertEquals(event_2.getStartDate(), event_1.getStartDate());
+        assertEquals(event_2.getEndDate(), event_1.getEndDate());
     }
 
     @Test
-    void setNewAmountTest() {
-        assertEquals(100, manager.getAnEvent(manager.getEventIdList().get(0)).getAmountOfPeople());
-        assertEquals(50, manager.getAnEvent(manager.getEventIdList().get(1)).getAmountOfPeople());
-        manager.setNewAmount(150, manager.getEventIdList().get(0));
-        manager.setNewAmount(300, manager.getEventIdList().get(1));
-        assertEquals(150, manager.getAnEvent(manager.getEventIdList().get(0)).getAmountOfPeople());
-        assertEquals(300, manager.getAnEvent(manager.getEventIdList().get(1)).getAmountOfPeople());
-    }
-
-    @Test
-    void deleteEventTest() {
+    void deleteEventTest() throws EventIdNotFoundException {
         assertEquals(2, manager.getAllEvent().size());
         manager.deleteEvent(manager.getEventIdList().get(0));
         assertEquals(1, manager.getAllEvent().size());
@@ -83,7 +82,7 @@ public class StonksEventManagerTest {
     }
 
     @Test
-    void deleteEventWithActivitiesTest() {
+    void deleteEventWithActivitiesTest() throws EventIdNotFoundException {
         assertEquals(2, manager.getAllEvent().size());
         assertEquals("StonksEvent", manager.getAnEvent(manager.getEventIdList().get(0)).getName());
         manager.createActivity(date_2, duration_1, "CodingGame", manager.getEventIdList().get(0));
@@ -110,7 +109,7 @@ public class StonksEventManagerTest {
     }
 
     @Test
-    void deleteEventWithMoreActivitiesTest() {
+    void deleteEventWithMoreActivitiesTest() throws AlreadyExistingEventException, EventIdNotFoundException {
         manager.createEvent("BonbonStyle", 100, date_3, date_4);
         manager.createActivity(date_3, duration_1, "BonbonRedParty!", 20, manager.getEventIdList().get(2));
         manager.createActivity(date_3, duration_1, "BonbonBlueParty!", 50, manager.getEventIdList().get(2));

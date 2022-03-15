@@ -3,6 +3,10 @@ package fr.stonksdev.backend.components;
 import fr.stonksdev.backend.entities.Activity;
 import fr.stonksdev.backend.entities.Duration;
 import fr.stonksdev.backend.entities.StonksEvent;
+import fr.stonksdev.backend.exceptions.ActivityNotFoundException;
+import fr.stonksdev.backend.exceptions.AlreadyExistingEventException;
+import fr.stonksdev.backend.exceptions.EventIdNotFoundException;
+import fr.stonksdev.backend.interfaces.StonksEventFinder;
 import fr.stonksdev.backend.interfaces.Mail;
 import fr.stonksdev.backend.interfaces.StonksEventModifier;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +16,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Component
-public class StonksEventManager implements StonksEventModifier {
+public class StonksEventManager implements StonksEventModifier, StonksEventFinder {
 
     @Autowired
     private InMemoryDatabase inMemoryDatabase;
@@ -27,22 +31,30 @@ public class StonksEventManager implements StonksEventModifier {
     CREATE/MODIFY AN EVENT :
      */
     @Override
-    public void createEvent(String name, int maxPeopleAmount, LocalDateTime startDate, LocalDateTime endDate) {
+    public StonksEvent createEvent(String name, int maxPeopleAmount, LocalDateTime startDate, LocalDateTime endDate) throws AlreadyExistingEventException {
         StonksEvent newEvent = new StonksEvent(name, maxPeopleAmount, startDate, endDate);
+        if (findByName(name).isPresent()) {
+            throw new AlreadyExistingEventException(name);
+        }
         inMemoryDatabase.getEvents().put(newEvent.getId(), newEvent);
         eventIdList.add(newEvent.getId());
+
         mailProxy.send("stonksdev.polyevent@gmail.com", "New event created",
                   "An event called " + name + "has been created.");
+        return newEvent;
     }
 
     @Override
-    public void setNewEventName(String newName, UUID eventId) {
-        getAnEvent(eventId).setName(newName);
-    }
-
-    @Override
-    public void setNewAmount(int newMaxPeopleAmount, UUID eventId) {
-        getAnEvent(eventId).setAmountOfPeople(newMaxPeopleAmount);
+    public StonksEvent updateEvent(UUID eventId, int maxPeopleAmount, LocalDateTime startDate, LocalDateTime endDate) throws EventIdNotFoundException {
+        Optional<StonksEvent> event = findById(eventId);
+        if (event.isEmpty()) {
+            throw new EventIdNotFoundException(eventId.toString());
+        }
+        StonksEvent stonksEvent = event.get();
+        stonksEvent.setAmountOfPeople(maxPeopleAmount);
+        stonksEvent.setStartDate(startDate);
+        stonksEvent.setEndDate(endDate);
+        return stonksEvent;
     }
 
     /*
@@ -68,21 +80,24 @@ public class StonksEventManager implements StonksEventModifier {
     CREATE AN ACTIVITY
      */
     @Override
-    public void createActivity(LocalDateTime beginning, Duration duration, String name, String description, int maxPeopleAmount, UUID eventId) {
+    public Activity createActivity(LocalDateTime beginning, Duration duration, String name, String description, int maxPeopleAmount, UUID eventId) {
         Activity newActivity = new Activity(beginning, duration, name, description, maxPeopleAmount, eventId);
         createActivity(newActivity, eventId);
+        return newActivity;
     }
 
     @Override
-    public void createActivity(LocalDateTime beginning, Duration duration, String name, int maxPeopleAmount, UUID eventId) {
+    public Activity createActivity(LocalDateTime beginning, Duration duration, String name, int maxPeopleAmount, UUID eventId) {
         Activity newActivity = new Activity(beginning, duration, name, maxPeopleAmount, eventId);
         createActivity(newActivity, eventId);
+        return newActivity;
     }
 
     @Override
-    public void createActivity(LocalDateTime beginning, Duration duration, String name, UUID eventId) {
+    public Activity createActivity(LocalDateTime beginning, Duration duration, String name, UUID eventId) {
         Activity newActivity = new Activity(beginning, duration, name, eventId);
         createActivity(newActivity, eventId);
+        return newActivity;
     }
 
     private void createActivity(Activity newActivity, UUID eventId) {
@@ -97,6 +112,12 @@ public class StonksEventManager implements StonksEventModifier {
         }
         if (!alreadyExist) {
             inMemoryDatabase.getActivities().put(newActivity.getActivityID(), newActivity);
+            //TODO: put activity in an event
+            if (!inMemoryDatabase.getEventActivityAssociation().containsKey(eventId)) {
+                inMemoryDatabase.getEventActivityAssociation().put(eventId, new HashSet<>());
+            } else {
+                inMemoryDatabase.getEventActivityAssociation().get(eventId).add(newActivity);
+            }
             activitiesId.add(newActivity.getActivityID());
         }
     }
@@ -104,29 +125,18 @@ public class StonksEventManager implements StonksEventModifier {
     /*
     MODIFY AN ACTIVITY
      */
-    @Override
-    public void setNewActivityName(String newName, UUID activityId) {
-        inMemoryDatabase.getActivities().get(activityId).setName(newName);
-    }
 
     @Override
-    public void setNewActivityBeginning(LocalDateTime newBeginning, UUID activityId) {
-        inMemoryDatabase.getActivities().get(activityId).setBeginning(newBeginning);
-    }
-
-    @Override
-    public void setNewActivityDuration(Duration newDuration, UUID activityId) {
-        inMemoryDatabase.getActivities().get(activityId).setDuration(newDuration);
-    }
-
-    @Override
-    public void setNewActivityDescription(String newDescription, UUID activityId) {
-        inMemoryDatabase.getActivities().get(activityId).setDescription(newDescription);
-    }
-
-    @Override
-    public void setNewActivityMaxPeopleAmount(int newMaxPeopleAmount, UUID activityId) {
-        inMemoryDatabase.getActivities().get(activityId).setMaxPeopleAmount(newMaxPeopleAmount);
+    public Activity updateActivity(UUID activityId, int maxPeopleAmount, LocalDateTime startDate, Duration duration) throws ActivityNotFoundException {
+        Optional<Activity> optActivity = findActivityById(activityId);
+        if (optActivity.isEmpty()) {
+            throw new ActivityNotFoundException();
+        }
+        Activity activity = optActivity.get();
+        activity.setMaxPeopleAmount(maxPeopleAmount);
+        activity.setBeginning(startDate);
+        activity.setDuration(duration);
+        return activity;
     }
 
     /*
@@ -142,11 +152,10 @@ public class StonksEventManager implements StonksEventModifier {
     GETTER :
      */
 
-    public StonksEvent getAnEvent(UUID eventId) {
+    public StonksEvent getAnEvent(UUID eventId) throws EventIdNotFoundException {
         StonksEvent event = getAllEvent().get(eventId);
-
-        if (Objects.isNull(event)) {
-            throw new NoSuchElementException("No such event: " + eventId);
+        if (event == null) {
+            throw new EventIdNotFoundException("No such event: " + eventId);
         }
 
         return event;
@@ -168,12 +177,32 @@ public class StonksEventManager implements StonksEventModifier {
         return inMemoryDatabase.getActivities();
     }
 
+    public Set<Activity> getAllActivitiesFromEvent(UUID eventId) {
+        return inMemoryDatabase.getEventActivityAssociation().get(eventId);
+    }
+
     public List<UUID> getEventIdList() {
         return eventIdList;
     }
 
     public List<UUID> getActivitiesId() {
         return activitiesId;
+    }
+
+    @Override
+    public Optional<StonksEvent> findByName(String name) {
+        return inMemoryDatabase.getEvents().values().stream().filter(stonksEvent -> stonksEvent.getName().equals(name)).findFirst();
+    }
+
+    @Override
+    public Optional<StonksEvent> findById(UUID id) {
+        StonksEvent event = inMemoryDatabase.getEvents().get(id);
+        return Optional.ofNullable(event);
+    }
+
+    private Optional<Activity> findActivityById(UUID id) {
+        Activity activity = inMemoryDatabase.getActivities().get(id);
+        return Optional.ofNullable(activity);
     }
 
     public void reset() {

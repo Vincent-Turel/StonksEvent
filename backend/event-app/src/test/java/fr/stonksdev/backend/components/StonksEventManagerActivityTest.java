@@ -1,6 +1,9 @@
 package fr.stonksdev.backend.components;
 
+import fr.stonksdev.backend.entities.Activity;
 import fr.stonksdev.backend.entities.Duration;
+import fr.stonksdev.backend.exceptions.ActivityNotFoundException;
+import fr.stonksdev.backend.exceptions.AlreadyExistingEventException;
 import fr.stonksdev.backend.interfaces.Mail;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +33,7 @@ public class StonksEventManagerActivityTest {
     private final Duration duration_2 = Duration.ofMinutes(100);
 
     @BeforeEach
-    void setup() {
+    void setup() throws AlreadyExistingEventException {
         when(mailMock.send(anyString(),anyString(), anyString())).thenReturn(true);
 
         manager.reset();
@@ -49,33 +52,13 @@ public class StonksEventManagerActivityTest {
     }
 
     @Test
-    void setNewActivityName() {
-        manager.setNewActivityName("NoelStonks", manager.getActivitiesId().get(0));
-        assertEquals("NoelStonks", manager.getAnActivity(manager.getActivitiesId().get(0)).getName());
-    }
-
-    @Test
-    void setNewActivityBeginningTest() {
-        manager.setNewActivityBeginning(date_2, manager.getActivitiesId().get(0));
-        assertEquals(date_2, manager.getAnActivity(manager.getActivitiesId().get(0)).getBeginning());
-    }
-
-    @Test
-    void setNewActivityDurationTest() {
-        manager.setNewActivityDuration(duration_2, manager.getActivitiesId().get(0));
-        assertEquals(duration_2, manager.getAnActivity(manager.getActivitiesId().get(0)).getDuration());
-    }
-
-    @Test
-    void setNewActivityDescriptionTest() {
-        manager.setNewActivityDescription("NewDescription", manager.getActivitiesId().get(0));
-        assertEquals("NewDescription", manager.getAnActivity(manager.getActivitiesId().get(0)).getDescription());
-    }
-
-    @Test
-    void setNewActivityMaxPeopleAmount() {
-        manager.setNewActivityMaxPeopleAmount(20, manager.getActivitiesId().get(0));
-        assertEquals(20, manager.getAnActivity(manager.getActivitiesId().get(0)).getMaxPeopleAmount());
+    void updateActivityTest() throws ActivityNotFoundException {
+        Activity activity = manager.getAnActivity(manager.getActivitiesId().get(0));
+        manager.updateActivity(activity.getActivityID(), 200, date_2, duration_2);
+        assertEquals("MyLittlePony", activity.getName());
+        assertEquals(200, activity.getMaxPeopleAmount());
+        assertEquals(date_2, activity.getBeginning());
+        assertEquals(duration_2, activity.getDuration());
     }
 
     @Test

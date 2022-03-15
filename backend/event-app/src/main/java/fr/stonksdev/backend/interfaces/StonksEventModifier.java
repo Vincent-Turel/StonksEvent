@@ -3,6 +3,9 @@ package fr.stonksdev.backend.interfaces;
 import fr.stonksdev.backend.entities.Duration;
 import fr.stonksdev.backend.entities.Activity;
 import fr.stonksdev.backend.entities.StonksEvent;
+import fr.stonksdev.backend.exceptions.ActivityNotFoundException;
+import fr.stonksdev.backend.exceptions.AlreadyExistingEventException;
+import fr.stonksdev.backend.exceptions.EventIdNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -12,34 +15,29 @@ public interface StonksEventModifier {
     /*
     CREATE/MODIFY AN EVENT :
      */
-    void createEvent(String name, int maxPeopleAmount, LocalDateTime startDate, LocalDateTime endDate);
+    StonksEvent createEvent(String name, int maxPeopleAmount, LocalDateTime startDate, LocalDateTime endDate) throws AlreadyExistingEventException;
 
-    void setNewEventName(String newName, UUID eventId);
-    void setNewAmount(int newMaxPeopleAmount, UUID eventId);
+    StonksEvent updateEvent(UUID eventId, int maxPeopleAmount, LocalDateTime startDate, LocalDateTime endDate) throws EventIdNotFoundException;
 
     void deleteEvent(UUID eventID);
 
     /*
     CREATE/MODIFY AN ACTIVITY :
      */
-    void createActivity(LocalDateTime beginning, Duration duration, String name, String description, int maxPeopleAmount, UUID eventId);
-    void createActivity(LocalDateTime beginning, Duration duration, String name, int maxPeopleAmount, UUID eventId);
-    void createActivity(LocalDateTime beginning, Duration duration, String name, UUID eventId);
+    Activity createActivity(LocalDateTime beginning, Duration duration, String name, String description, int maxPeopleAmount, UUID eventId);
+    Activity createActivity(LocalDateTime beginning, Duration duration, String name, int maxPeopleAmount, UUID eventId);
+    Activity createActivity(LocalDateTime beginning, Duration duration, String name, UUID eventId);
 
-    void setNewActivityName(String newName, UUID activityId);
-    void setNewActivityBeginning(LocalDateTime newBeginning, UUID activityId);
-    void setNewActivityDuration(Duration newDuration, UUID activityId);
-    void setNewActivityDescription(String newDescription, UUID activityId);
-    void setNewActivityMaxPeopleAmount(int newMaxPeopleAmount, UUID activityId);
+    Activity updateActivity(UUID activityId, int maxPeopleAmount, LocalDateTime startDate, Duration duration) throws ActivityNotFoundException;
 
     void deleteActivity(UUID activityId);
 
     /*
     GETTER :
      */
-    public StonksEvent getAnEvent(UUID eventId);
-    public Map<UUID, StonksEvent> getAllEvent();
-    public Activity getAnActivity(UUID activityId);
-    public Map<UUID, Activity> getAllActivities();
-    public void reset();
+    StonksEvent getAnEvent(UUID eventId) throws EventIdNotFoundException;
+    Map<UUID, StonksEvent> getAllEvent();
+    Activity getAnActivity(UUID activityId);
+    Map<UUID, Activity> getAllActivities();
+    void reset();
 }

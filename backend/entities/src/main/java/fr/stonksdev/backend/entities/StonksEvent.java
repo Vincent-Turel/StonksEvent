@@ -28,12 +28,20 @@ public class StonksEvent implements Serializable {
         this.name = newName;
     }
 
-    public int getAmountOfPeople() {
-        return amountOfPeople;
-    }
-
     public void setAmountOfPeople(int newNumber) {
         this.amountOfPeople = newNumber;
+    }
+
+    public void setStartDate(LocalDateTime startDate) {
+        this.startDate = startDate;
+    }
+
+    public void setEndDate(LocalDateTime endDate) {
+        this.endDate = endDate;
+    }
+
+    public int getAmountOfPeople() {
+        return amountOfPeople;
     }
 
     public LocalDateTime getStartDate() {
