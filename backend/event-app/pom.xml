@@ -22,6 +22,12 @@
             <artifactId>entities</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>2.13.2</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -29,6 +35,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>2.6.4</version>
             </plugin>
             <!-- maven-surefire-plugin is designed for running unit tests and if any of the tests fail then it will fail the build immediately.
                  maven-failsafe-plugin is designed for running integration tests, and decouples failing the build if there are test failures from actually running the tests."
