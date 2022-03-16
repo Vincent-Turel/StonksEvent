@@ -115,9 +115,10 @@ public class StonksEventManager implements StonksEventModifier, StonksEventFinde
             //TODO: put activity in an event
             if (!inMemoryDatabase.getEventActivityAssociation().containsKey(eventId)) {
                 inMemoryDatabase.getEventActivityAssociation().put(eventId, new HashSet<>());
-            } else {
-                inMemoryDatabase.getEventActivityAssociation().get(eventId).add(newActivity);
             }
+
+            inMemoryDatabase.getEventActivityAssociation().get(eventId).add(newActivity);
+
             activitiesId.add(newActivity.getActivityID());
         }
     }
