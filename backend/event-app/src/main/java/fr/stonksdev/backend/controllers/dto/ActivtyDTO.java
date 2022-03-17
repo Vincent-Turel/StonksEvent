@@ -21,6 +21,9 @@ public class ActivtyDTO {
         this.duration = duration;
     }
 
+    private ActivtyDTO() {
+    }
+
     public UUID getId() {
         return id;
     }

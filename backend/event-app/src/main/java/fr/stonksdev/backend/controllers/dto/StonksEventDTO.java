@@ -10,6 +10,9 @@ public class StonksEventDTO {
     public LocalDateTime endDate;
     public UUID id;
 
+    private StonksEventDTO() {
+    }
+
     public StonksEventDTO(String name, int amountOfPeople, LocalDateTime start, LocalDateTime end) {
         this.name = name;
         this.amountOfPeople = amountOfPeople;
