@@ -40,7 +40,7 @@ public class StonksEventManager implements StonksEventModifier, StonksEventFinde
         eventIdList.add(newEvent.getId());
 
         mailProxy.send("stonksdev.polyevent@gmail.com", "New event created",
-                  "An event called " + name + "has been created.");
+                "An event called " + name + "has been created.");
         return newEvent;
     }
 

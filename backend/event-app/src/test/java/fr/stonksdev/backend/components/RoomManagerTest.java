@@ -1,11 +1,9 @@
 package fr.stonksdev.backend.components;
 
-import fr.stonksdev.backend.entities.Duration;
 import fr.stonksdev.backend.entities.Room;
 import fr.stonksdev.backend.entities.RoomKind;
 import fr.stonksdev.backend.exceptions.AlreadyExistingRoomException;
 import fr.stonksdev.backend.exceptions.RoomIdNotFoundException;
-import fr.stonksdev.backend.exceptions.RoomNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
