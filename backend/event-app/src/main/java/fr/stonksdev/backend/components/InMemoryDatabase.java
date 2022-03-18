@@ -2,10 +2,12 @@ package fr.stonksdev.backend.components;
 
 import fr.stonksdev.backend.entities.Activity;
 import fr.stonksdev.backend.entities.Room;
+import fr.stonksdev.backend.entities.RoomKind;
 import fr.stonksdev.backend.entities.StonksEvent;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 @Component
 public class InMemoryDatabase {
@@ -56,5 +58,17 @@ public class InMemoryDatabase {
         eventActivityAssociation = new HashMap<>();
         rooms = new HashMap<>();
         roomPlanning = new HashMap<>();
+
+        addHardcodedRooms();
+    }
+
+    // As an interim solution, we add hardcoded rooms to the database.
+    private void addHardcodedRooms() {
+        Room room314 = new Room("O+314", RoomKind.Classroom, 20);
+        Room room106 = new Room("O+106", RoomKind.Classroom, 16);
+        Room amphiForum = new Room("Amphi Forum", RoomKind.Amphitheatre, 200);
+        Room amphi228 = new Room("O+228", RoomKind.Amphitheatre, 120);
+
+        Stream.of(room314, room106, amphiForum, amphi228).forEach(room -> rooms.put(UUID.randomUUID(), room));
     }
 }
