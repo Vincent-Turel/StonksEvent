@@ -14,6 +14,8 @@ public class TimeSlot {
     public LocalDateTime beginning;
     public Duration duration;
 
+    public TimeSlot() {}
+
     public TimeSlot(String activityName, LocalDateTime beginning, Duration duration) {
         this.activityName = activityName;
         this.beginning = beginning;
