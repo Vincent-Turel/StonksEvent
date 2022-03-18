@@ -56,6 +56,20 @@ pipeline {
                 }
             }
         }
+        /*stage('Build controllers - dev') {
+            environment {
+                MODULE = "controllers"
+            }
+            when {
+                expression { env.BRANCH_NAME == 'develop' }
+            }
+            steps {
+                echo "Building controllers develop"
+                dir("${env.WORKSPACE}/backend"){
+                    script { deploy_module() }
+                }
+            }
+        }*/
         stage('Build event-app - dev') {
             environment {
                 MODULE = "event-app"

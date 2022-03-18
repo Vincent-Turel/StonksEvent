@@ -2,8 +2,8 @@ package fr.stonksdev.backend.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.stonksdev.backend.components.StonksEventManager;
-import fr.stonksdev.backend.controllers.dto.ActivtyDTO;
-import fr.stonksdev.backend.controllers.dto.StonksEventDTO;
+import fr.stonksdev.backend.entities.dto.ActivtyDTO;
+import fr.stonksdev.backend.entities.dto.StonksEventDTO;
 import fr.stonksdev.backend.entities.Activity;
 import fr.stonksdev.backend.entities.Duration;
 import fr.stonksdev.backend.entities.StonksEvent;

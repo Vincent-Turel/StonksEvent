@@ -1,9 +1,9 @@
 package fr.stonksdev.backend.controllers;
 
 import fr.stonksdev.backend.components.StonksEventManager;
-import fr.stonksdev.backend.controllers.dto.ActivtyDTO;
-import fr.stonksdev.backend.controllers.dto.ErrorDTO;
-import fr.stonksdev.backend.controllers.dto.StonksEventDTO;
+import fr.stonksdev.backend.entities.dto.ActivtyDTO;
+import fr.stonksdev.backend.entities.dto.ErrorDTO;
+import fr.stonksdev.backend.entities.dto.StonksEventDTO;
 import fr.stonksdev.backend.entities.Activity;
 import fr.stonksdev.backend.entities.StonksEvent;
 import fr.stonksdev.backend.exceptions.*;
@@ -13,10 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 

@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 
-@SpringBootTest
+@SpringBootTest()
 public class StonksEventManagerTest {
     /*
     REFAIRE LES TEST EN ISOLATION

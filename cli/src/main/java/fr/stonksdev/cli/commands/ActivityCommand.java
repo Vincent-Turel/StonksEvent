@@ -1,6 +1,7 @@
 package fr.stonksdev.cli.commands;
 
 import fr.stonksdev.cli.CliContext;
+import fr.stonksdev.cli.exceptions.EventDoesNotExistException;
 import fr.stonksdev.cli.model.Activity;
 import fr.stonksdev.cli.model.Duration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,14 +11,15 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.UUID;
 
 @ShellComponent
 public class ActivityCommand {
-    public static final String BASE_URI = "/events";
-    public static final String ACTIVITY_URI = "/activities";
+    private static final String BASE_URI = "/events";
+    private static final String ACTIVITY_URI = "/activities";
 
-    public static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
 
     @Autowired
@@ -27,10 +29,10 @@ public class ActivityCommand {
     private CliContext cliContext;
 
     @ShellMethod("Create an activity (create-activity EVENT_NAME ACTIVITY_NAME MAX_NUMBER_PEOPLE START_DATE DURATION)\n DATE FORMAT = dd/mm/yyyy hh:mm, DURATION FORMAT = positive integer")
-    public Activity createActivity(String eventName, String activityName, int nbPeople, String start, int duration) throws Exception {
+    public Activity createActivity(String eventName, String activityName, int nbPeople, String start, int duration) throws DateTimeParseException, EventDoesNotExistException {
         LocalDateTime startDate = LocalDateTime.parse(start, formatter);
         if (!cliContext.getEvents().containsKey(eventName)) {
-            throw new Exception("The event '" + eventName + "' does not exist, please, use this command for only an existing event.");
+            throw new EventDoesNotExistException("The event '" + eventName + "' does not exist, please, use this command for only an existing event.");
         }
         UUID eventId = cliContext.getEvents().get(eventName).id;
         Activity activity = restTemplate.postForObject(BASE_URI + "/" + eventId + ACTIVITY_URI, new Activity(startDate, Duration.ofMinutes(duration), activityName, nbPeople), Activity.class);
@@ -60,7 +62,7 @@ public class ActivityCommand {
             throw new Exception("The event '" + eventName + "' does not exist, please, use this command for only an existing event.");
         }
         UUID eventId = cliContext.getEvents().get(eventName).id;
-        return restTemplate.getForObject(BASE_URI + eventId + ACTIVITY_URI, String.class);
+        return restTemplate.getForObject(BASE_URI + "/" + eventId + ACTIVITY_URI, String.class);
     }
 
     @ShellMethod("List all activities")

@@ -1,4 +1,4 @@
-package fr.stonksdev.backend.controllers.dto;
+package fr.stonksdev.backend.entities.dto;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -10,14 +10,15 @@ public class StonksEventDTO {
     public LocalDateTime endDate;
     public UUID id;
 
-    private StonksEventDTO() {
-    }
-
     public StonksEventDTO(String name, int amountOfPeople, LocalDateTime start, LocalDateTime end) {
         this.name = name;
         this.amountOfPeople = amountOfPeople;
         this.startDate = start;
         this.endDate = end;
+    }
+
+    private StonksEventDTO() {
+
     }
 
     @Override

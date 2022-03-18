@@ -4,8 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.time.LocalDateTime;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
@@ -22,21 +20,5 @@ class BackendApplicationTests {
     /*
     @Test
     void contextLoads() {
-    }
-
-    @Test
-    void simpleEventCreation() {
-        /*
-        StonksEvent e = new StonksEvent();
-
-        e.addRoom(new Room());
-        e.addRoom(new Room());
-
-        e.addActivity(new Activity());
-        e.addActivity(new Activity());
-
-        assertThrows(RuntimeException.class, () -> e.addActivity(new Activity()));
-
-    }
-    */
+    }*/
 }

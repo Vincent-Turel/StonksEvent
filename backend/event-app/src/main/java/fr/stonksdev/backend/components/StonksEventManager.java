@@ -9,6 +9,8 @@ import fr.stonksdev.backend.exceptions.EventIdNotFoundException;
 import fr.stonksdev.backend.interfaces.StonksEventFinder;
 import fr.stonksdev.backend.interfaces.Mail;
 import fr.stonksdev.backend.interfaces.StonksEventModifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -40,7 +42,7 @@ public class StonksEventManager implements StonksEventModifier, StonksEventFinde
         eventIdList.add(newEvent.getId());
 
         mailProxy.send("stonksdev.polyevent@gmail.com", "New event created",
-                "An event called " + name + "has been created.");
+                  "An event called " + name + " has been created.");
         return newEvent;
     }
 

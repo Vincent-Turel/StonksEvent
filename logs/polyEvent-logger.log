@@ -1,0 +1,24 @@
+2022-03-18 09:37:12,970 INFO org.springframework.boot.StartupInfoLogger [main] Starting BackendApplication using Java 11.0.14 on VT-Laptop with PID 20756 (D:\Documents\Git\isa-devops-21-22-team-h-2022\backend\controllers\target\classes started by Vincent in D:\Documents\Git\isa-devops-21-22-team-h-2022)
+2022-03-18 09:37:12,974 DEBUG org.springframework.boot.StartupInfoLogger [main] Running with Spring Boot v2.6.4, Spring v5.3.16
+2022-03-18 09:37:12,974 INFO org.springframework.boot.SpringApplication [main] No active profile set, falling back to 1 default profile: "default"
+2022-03-18 09:37:13,726 INFO org.springframework.context.support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker [main] Bean 'org.springframework.ws.config.annotation.DelegatingWsConfiguration' of type [org.springframework.ws.config.annotation.DelegatingWsConfiguration$$EnhancerBySpringCGLIB$$10c994ff] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2022-03-18 09:37:13,767 INFO org.springframework.ws.soap.addressing.server.AbstractAddressingEndpointMapping [main] Supporting [WS-Addressing August 2004, WS-Addressing 1.0]
+2022-03-18 09:37:14,249 INFO org.springframework.boot.web.embedded.tomcat.TomcatWebServer [main] Tomcat initialized with port(s): 8080 (http)
+2022-03-18 09:37:14,259 INFO org.apache.juli.logging.DirectJDKLog [main] Initializing ProtocolHandler ["http-nio-8080"]
+2022-03-18 09:37:14,260 INFO org.apache.juli.logging.DirectJDKLog [main] Starting service [Tomcat]
+2022-03-18 09:37:14,260 INFO org.apache.juli.logging.DirectJDKLog [main] Starting Servlet engine: [Apache Tomcat/9.0.58]
+2022-03-18 09:37:14,341 INFO org.apache.juli.logging.DirectJDKLog [main] Initializing Spring embedded WebApplicationContext
+2022-03-18 09:37:14,341 INFO org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext [main] Root WebApplicationContext: initialization completed in 1314 ms
+2022-03-18 09:37:15,079 INFO org.apache.juli.logging.DirectJDKLog [main] Starting ProtocolHandler ["http-nio-8080"]
+2022-03-18 09:37:15,110 INFO org.springframework.boot.web.embedded.tomcat.TomcatWebServer [main] Tomcat started on port(s): 8080 (http) with context path ''
+2022-03-18 09:37:15,123 INFO org.springframework.boot.StartupInfoLogger [main] Started BackendApplication in 2.68 seconds (JVM running for 3.966)
+2022-03-18 09:38:12,773 INFO org.apache.juli.logging.DirectJDKLog [http-nio-8080-exec-1] Initializing Spring DispatcherServlet 'dispatcherServlet'
+2022-03-18 09:38:12,774 INFO org.springframework.web.servlet.FrameworkServlet [http-nio-8080-exec-1] Initializing Servlet 'dispatcherServlet'
+2022-03-18 09:38:12,775 INFO org.springframework.web.servlet.FrameworkServlet [http-nio-8080-exec-1] Completed initialization in 0 ms
+2022-03-18 09:38:12,888 INFO fr.stonksdev.backend.controllers.LoggerController [http-nio-8080-exec-1] PolyEvent:Rest-Controller:fr.stonksdev.backend.controllers.StonksEventController@22f8e7ce:Called registerEvent [StonksEvent{, name='test', amountOfPeople=56, startDate=2000-01-01T21:14, endDate=2000-01-02T22:18}]
+2022-03-18 09:38:12,906 DEBUG fr.stonksdev.backend.controllers.LoggerController [http-nio-8080-exec-1] PolyEvent:Components:fr.stonksdev.backend.components.InMemoryDatabase@36575774:Returned getEvents with value {}
+2022-03-18 09:38:12,906 DEBUG fr.stonksdev.backend.controllers.LoggerController [http-nio-8080-exec-1] PolyEvent:Components:fr.stonksdev.backend.components.InMemoryDatabase@36575774:Returned getEvents with value {}
+2022-03-18 09:38:14,996 INFO fr.stonksdev.backend.components.MailProxy [http-nio-8080-exec-1] Mail could not be sent because server was not responding at http://localhost:9090
+2022-03-18 09:38:14,997 DEBUG fr.stonksdev.backend.controllers.LoggerController [http-nio-8080-exec-1] PolyEvent:Components:fr.stonksdev.backend.components.MailProxy@4ff45233:Returned send with value false
+2022-03-18 09:38:14,998 DEBUG fr.stonksdev.backend.controllers.LoggerController [http-nio-8080-exec-1] PolyEvent:Components:fr.stonksdev.backend.components.StonksEventManager@38547fc4:Returned createEvent with value fr.stonksdev.backend.entities.StonksEvent@8774c79e
+2022-03-18 09:38:15,003 INFO fr.stonksdev.backend.controllers.LoggerController [http-nio-8080-exec-1] PolyEvent:Rest-Controller:fr.stonksdev.backend.controllers.StonksEventController@22f8e7ce:Returned registerEvent with value <201 CREATED Created,StonksEvent{, name='test', amountOfPeople=56, startDate=2000-01-01T21:14, endDate=2000-01-02T22:18},[]>

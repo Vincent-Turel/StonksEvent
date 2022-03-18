@@ -1,4 +1,4 @@
-package fr.stonksdev.backend.controllers.dto;
+package fr.stonksdev.backend.entities.dto;
 
 import fr.stonksdev.backend.entities.Duration;
 

@@ -9,32 +9,34 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.UUID;
 
 @ShellComponent
 public class EventCommand {
 
-    public static final String BASE_URI = "/events";
+    private static final String BASE_URI = "/events";
 
-    public static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
 
     @Autowired
     RestTemplate restTemplate;
 
     @Autowired
-    private CliContext cliContext;
+    CliContext cliContext;
 
-    @ShellMethod("Create an event (create-event EVENT_NAME NUMBER_OF_ATTENDEE START_DATE END_DATE)\n DATE FORMAT = dd/mm/yyyy")
-    public StonksEvent createEvent(String name, int poepleNb, String start, String end) {
+    @ShellMethod("Create an event (create-event EVENT_NAME NUMBER_OF_ATTENDEE START_DATE END_DATE)\n DATE FORMAT = dd/mm/yyyy hh:mm")
+    public StonksEvent createEvent(String name, int poepleNb, String start, String end) throws DateTimeParseException {
         LocalDateTime startDate = LocalDateTime.parse(start, formatter);
         LocalDateTime endDate = LocalDateTime.parse(end, formatter);
+
         StonksEvent event = restTemplate.postForObject(BASE_URI, new StonksEvent(name, poepleNb, startDate, endDate), StonksEvent.class);
         cliContext.getEvents().put(name, event);
         return event;
     }
 
-    @ShellMethod("Update an event (update-event EVENT_NAME NUMBER_OF_ATTENDEE START_DATE END_DATE)\n DATE FORMAT = dd/mm/yyyy \n Constraint : same event name")
+    @ShellMethod("Update an event (update-event EVENT_NAME NUMBER_OF_ATTENDEE START_DATE END_DATE)\n DATE FORMAT = dd/mm/yyyy hh:mm \n Constraint : same event name")
     public StonksEvent updateEvent(String name, int poepleNb, String start, String end) throws Exception {
         LocalDateTime startDate = LocalDateTime.parse(start, formatter);
         LocalDateTime endDate = LocalDateTime.parse(end, formatter);

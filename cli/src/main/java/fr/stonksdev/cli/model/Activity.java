@@ -1,6 +1,7 @@
 package fr.stonksdev.cli.model;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 public class Activity {
@@ -17,6 +18,10 @@ public class Activity {
         this.maxPeopleAmount = maxPeopleAmount;
     }
 
+    private Activity() {
+
+    }
+
     @Override
     public String toString() {
         return "Activity{" +
@@ -26,5 +31,19 @@ public class Activity {
                 ", beginning=" + beginning +
                 ", duration=" + duration +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Activity)) return false;
+        Activity activity = (Activity) o;
+        return maxPeopleAmount == activity.maxPeopleAmount && Objects.equals(beginning, activity.beginning)
+                && Objects.equals(duration, activity.duration) && Objects.equals(name, activity.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(beginning, duration, name, maxPeopleAmount, id);
     }
 }

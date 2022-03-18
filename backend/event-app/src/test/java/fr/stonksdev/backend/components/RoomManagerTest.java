@@ -14,8 +14,9 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@SpringBootTest
+@SpringBootTest()
 public class RoomManagerTest {
+
     @Autowired
     private InMemoryDatabase inMemoryDatabase;
     @Autowired
