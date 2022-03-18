@@ -3,15 +3,12 @@ package fr.stonksdev.backend.components;
 import fr.stonksdev.backend.entities.Duration;
 import fr.stonksdev.backend.entities.Room;
 import fr.stonksdev.backend.entities.RoomKind;
-import fr.stonksdev.backend.exceptions.AlreadyExistingRoomException;
 import fr.stonksdev.backend.exceptions.RoomNotFoundException;
 import fr.stonksdev.backend.interfaces.RoomExplorer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -40,34 +37,18 @@ public class RoomPlanning implements RoomExplorer {
     }
 
     private UUID finder(Optional<RoomKind> roomKind, LocalDateTime beginning, Duration duration, int minCapacity) throws RoomNotFoundException {
-        UUID find = null;
-        int size = -1;
-        if (!inMemoryDatabase.getRooms().isEmpty()) {
-            for (Map.Entry<UUID, Room> item : inMemoryDatabase.getRooms().entrySet()) {
-                if (checkRoomKind(item, roomKind) && item.getValue().getCapacity() >= minCapacity && (size == -1 || size > item.getValue().getCapacity())) {
-                    List<UUID> listActivity = inMemoryDatabase.getRoomPlanning().get(item.getKey());
-                    if (listActivity == null || listActivity.isEmpty()) {
-                        size = item.getValue().getCapacity();
-                        find = item.getKey();
-                    } else {
-                        boolean isFree = true;
-                        for (UUID value : listActivity) {
-                            if (inMemoryDatabase.getActivities().get(value).getEndDate().isAfter(beginning)) {
-                                isFree = false;
-                            }
-                        }
-                        if (isFree) {
-                            size = item.getValue().getCapacity();
-                            find = item.getKey();
-                        }
-                    }
-                }
-            }
-        }
-        if (size != -1 && find != null) {
-            return find;
-        }
-        throw new RoomNotFoundException();
+        // So.
+        // We tried our best to provide a good implementation of finder. The
+        // previous implementation is very weird and basically impossible to
+        // understand. See the link below for more.
+        // As an interim solution, we put a dummy algorithm which selects the
+        // first room it sees.
+        //
+        // We will provide a correct implementation as part of the next
+        // iteration.
+        //
+        // https://github.com/pns-isa-devops/isa-devops-21-22-team-h-2022/blob/e147b2680f5979af0c581ad31dd0812ed525a4ca/backend/event-app/src/main/java/fr/stonksdev/backend/components/RoomPlanning.java#L43
+        return inMemoryDatabase.getRooms().keySet().stream().findFirst().orElseThrow(RoomNotFoundException::new);
     }
 
     @Override
