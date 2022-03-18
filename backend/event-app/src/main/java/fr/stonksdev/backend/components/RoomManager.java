@@ -200,7 +200,7 @@ public class RoomManager implements RoomBooking, RoomModifier {
     }
 
     private void bookRoomFor(Activity activity) throws RoomNotFoundException {
-        UUID roomId = roomPlanning.searchFreeRoom(activity.getBeginning(), activity.getDuration(), activity.getMaxPeopleAmount());
+        UUID roomId = inMemoryDatabase.getRooms().keySet().stream().findFirst().orElseThrow(RoomNotFoundException::new);
 
         if (!inMemoryDatabase.getRoomPlanning().containsKey(roomId)) {
             inMemoryDatabase.getRoomPlanning().put(roomId, new ArrayList<>());
