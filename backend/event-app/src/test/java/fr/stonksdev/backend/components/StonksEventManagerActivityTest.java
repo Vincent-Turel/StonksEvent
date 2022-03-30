@@ -5,16 +5,17 @@ import fr.stonksdev.backend.entities.Duration;
 import fr.stonksdev.backend.exceptions.ActivityNotFoundException;
 import fr.stonksdev.backend.exceptions.AlreadyExistingEventException;
 import fr.stonksdev.backend.interfaces.Mail;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-
-import java.time.LocalDateTime;
 
 @SpringBootTest
 public class StonksEventManagerActivityTest {
@@ -54,7 +55,7 @@ public class StonksEventManagerActivityTest {
     @Test
     void updateActivityTest() throws ActivityNotFoundException {
         Activity activity = manager.getAnActivity(manager.getActivitiesId().get(0));
-        manager.updateActivity(activity.getActivityID(), 200, date_2, duration_2);
+        manager.updateActivity(activity, 200, date_2, duration_2);
         assertEquals("MyLittlePony", activity.getName());
         assertEquals(200, activity.getMaxPeopleAmount());
         assertEquals(date_2, activity.getBeginning());
@@ -63,7 +64,8 @@ public class StonksEventManagerActivityTest {
 
     @Test
     void deleteActivityTest() {
-        manager.deleteActivity(manager.getActivitiesId().get(0));
+        manager.deleteActivity(manager.getAllActivities().values().stream().findFirst().get());
+
         assertEquals(0, manager.getAllActivities().size());
     }
 }

@@ -1,12 +1,13 @@
 package fr.stonksdev.backend.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.stonksdev.backend.components.InMemoryDatabase;
 import fr.stonksdev.backend.components.StonksEventManager;
-import fr.stonksdev.backend.entities.dto.ActivtyDTO;
-import fr.stonksdev.backend.entities.dto.StonksEventDTO;
 import fr.stonksdev.backend.entities.Activity;
 import fr.stonksdev.backend.entities.Duration;
 import fr.stonksdev.backend.entities.StonksEvent;
+import fr.stonksdev.backend.entities.dto.ActivtyDTO;
+import fr.stonksdev.backend.entities.dto.StonksEventDTO;
 import fr.stonksdev.backend.exceptions.EventIdNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -18,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.mockito.Mockito.eq;
@@ -34,6 +36,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class StonksEventControllerTests {
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    @MockBean
+    private InMemoryDatabase inMemoryDatabase;
 
     @MockBean
     private StonksEventManager mockedEventManager;
@@ -109,19 +115,23 @@ public class StonksEventControllerTests {
 
     @Test
     void updateActivityTest() throws Exception {
-        Activity activity = new Activity(LocalDateTime.parse("13/10/2022 08:00", formatter), Duration.ofMinutes(50), "test", 10, UUID.randomUUID());
-        Activity activityUpdated = new Activity(LocalDateTime.parse("13/10/2022 08:00", formatter), Duration.ofMinutes(90), "test", 15, UUID.randomUUID());
+        UUID eventId = UUID.randomUUID();
+
+        Activity activity = new Activity(LocalDateTime.parse("13/10/2022 08:00", formatter), Duration.ofMinutes(50), "test", 10, eventId);
+        Activity activityUpdated = new Activity(LocalDateTime.parse("13/10/2022 08:00", formatter), Duration.ofMinutes(90), "test", 15, eventId);
+
         ActivtyDTO activtyDTO = new ActivtyDTO(activity.getName(), activity.getMaxPeopleAmount(), "", activity.getBeginning(), activity.getDuration());
-        when(mockedEventManager.updateActivity(Mockito.any(UUID.class), Mockito.any(int.class), Mockito.any(LocalDateTime.class), Mockito.any(Duration.class)))
+        when(mockedEventManager.updateActivity(Mockito.any(Activity.class), Mockito.any(int.class), Mockito.any(LocalDateTime.class), Mockito.any(Duration.class)))
                 .thenReturn(activityUpdated);
 
+        when(inMemoryDatabase.getActivities()).thenReturn(Map.of(activity.getActivityID(), activity));
+
         String jsonActivity = jsonConverter(activtyDTO);
-        mockMvc.perform(post(StonksEventController.EVENTS_URI + "/" + UUID.randomUUID() + "/activities/" + UUID.randomUUID())
+        mockMvc.perform(post(StonksEventController.EVENTS_URI + "/" + eventId + "/activities/" + activity.getActivityID())
                         .content(jsonActivity).contentType(APPLICATION_JSON).accept(APPLICATION_JSON))
                 .andExpect(status().is(201))
                 .andExpect(jsonPath("$.name").value(activityUpdated.getName()))
                 .andExpect(jsonPath("$.maxPeopleAmount").value(activityUpdated.getMaxPeopleAmount()))
                 .andExpect(jsonPath("$.duration.minutes").value(activityUpdated.getDuration().asMinutes()));
-
     }
 }

@@ -14,11 +14,11 @@ import java.util.Set;
 public interface EventModifier {
     StonksEvent create(String name, int maxPeopleAmount, LocalDateTime start, Duration duration) throws AlreadyExistingEventException;
 
-    boolean modify(String eventId, Activity activityToModify) throws EventIdNotFoundException, ActivityNotFoundException;
+    boolean modify(StonksEvent event, Activity activityToModify) throws EventIdNotFoundException, ActivityNotFoundException;
 
     boolean delete(StonksEvent eventToDelete) throws ItemNotFoundException;
 
     Set<StonksEvent> getAllEvents();
 
-    Set<Activity> getActivitiesWithEvent(String eventId) throws EventIdNotFoundException;
+    Set<Activity> getActivitiesWithEvent(StonksEvent event) throws EventIdNotFoundException;
 }

@@ -2,28 +2,26 @@ package fr.stonksdev.backend.features;
 
 import fr.stonksdev.backend.components.InMemoryDatabase;
 import fr.stonksdev.backend.components.StonksEventManager;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-
 import fr.stonksdev.backend.entities.Duration;
 import fr.stonksdev.backend.entities.StonksEvent;
 import fr.stonksdev.backend.exceptions.AlreadyExistingEventException;
 import fr.stonksdev.backend.exceptions.EventIdNotFoundException;
 import fr.stonksdev.backend.interfaces.Mail;
 import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.cucumber.spring.CucumberContextConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import io.cucumber.java.en.Given;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 @CucumberContextConfiguration
 @SpringBootTest
@@ -96,8 +94,8 @@ public class EventCreation {
     }
 
     @Then("there is only {int} activity on the event named {string}")
-    public void thereIsOnlyActivityOnTheEventNamed(int arg0, String arg1) {
-        System.out.println(eventManager.findByName(arg1).get().getId());
+    public void thereIsOnlyActivityOnTheEventNamed(int arg0, String arg1) throws EventIdNotFoundException {
+        System.out.println(eventManager.findByName(arg1).getId());
         assertEquals(arg0, eventManager.getAllActivities().size());
     }
 }

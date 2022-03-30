@@ -1,18 +1,22 @@
 package fr.stonksdev.backend.controllers;
 
+import fr.stonksdev.backend.components.InMemoryDatabase;
 import fr.stonksdev.backend.components.StonksEventManager;
+import fr.stonksdev.backend.entities.Activity;
+import fr.stonksdev.backend.entities.StonksEvent;
 import fr.stonksdev.backend.entities.dto.ActivtyDTO;
 import fr.stonksdev.backend.entities.dto.ErrorDTO;
 import fr.stonksdev.backend.entities.dto.StonksEventDTO;
-import fr.stonksdev.backend.entities.Activity;
-import fr.stonksdev.backend.entities.StonksEvent;
-import fr.stonksdev.backend.exceptions.*;
+import fr.stonksdev.backend.exceptions.ActivityNotFoundException;
+import fr.stonksdev.backend.exceptions.AlreadyExistingEventException;
+import fr.stonksdev.backend.exceptions.EventIdNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -28,6 +32,9 @@ public class StonksEventController {
 
     @Autowired
     private StonksEventManager eventManager;
+
+    @Autowired
+    private InMemoryDatabase inMemoryDatabase;
 
     @ExceptionHandler({EventIdNotFoundException.class})
     public ResponseEntity<ErrorDTO> handleExceptions(EventIdNotFoundException e) {
@@ -66,8 +73,14 @@ public class StonksEventController {
 
     @PostMapping(path = ACTIVITY_URI + "/{activityId}", consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<ActivtyDTO> updateActivity(@PathVariable("activityId") UUID activityId, @RequestBody ActivtyDTO activtyDTO) throws ActivityNotFoundException {
+        Activity activity = inMemoryDatabase.getActivities().get(activityId);
+
+        if (Objects.isNull(activity)) {
+            throw new ActivityNotFoundException();
+        }
+
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(convertActivityToDto(eventManager.updateActivity(activityId, activtyDTO.getMaxPeopleAmount(), activtyDTO.getBeginning(), activtyDTO.getDuration())));
+                .body(convertActivityToDto(eventManager.updateActivity(activity, activtyDTO.getMaxPeopleAmount(), activtyDTO.getBeginning(), activtyDTO.getDuration())));
     }
 
     @GetMapping(ACTIVITY_URI)

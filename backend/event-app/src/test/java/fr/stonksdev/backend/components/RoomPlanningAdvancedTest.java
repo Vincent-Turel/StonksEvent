@@ -1,10 +1,6 @@
 package fr.stonksdev.backend.components;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-
+import fr.stonksdev.backend.entities.Activity;
 import fr.stonksdev.backend.entities.Duration;
 import fr.stonksdev.backend.entities.Room;
 import fr.stonksdev.backend.entities.RoomKind;
@@ -19,6 +15,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+
 @SpringBootTest
 public class RoomPlanningAdvancedTest {
 
@@ -30,12 +31,15 @@ public class RoomPlanningAdvancedTest {
     private StonksEventManager activityManager;
     @Autowired
     private RoomPlanning planning;
+    @Autowired
+    private ActivityRegistry activityRegistry;
+
     @MockBean
     private Mail mailMock;
 
     @BeforeEach
-    void setup() throws AlreadyExistingRoomException, RoomAlreadyBookedException, ActivityNotFoundException, AlreadyExistingEventException {
-        when(mailMock.send(anyString(),anyString(), anyString())).thenReturn(true);
+    void setup() throws AlreadyExistingRoomException, RoomAlreadyBookedException, ActivityNotFoundException, AlreadyExistingEventException, RoomIdNotFoundException {
+        when(mailMock.send(anyString(), anyString(), anyString())).thenReturn(true);
 
         activityManager.reset();
         roomManager.reset();
@@ -45,8 +49,15 @@ public class RoomPlanningAdvancedTest {
         activityManager.createEvent("PanicCode", 150, LocalDateTime.of(2022, 1, 15, 8, 0), LocalDateTime.of(2022, 1, 30, 15, 0));
         activityManager.createActivity(LocalDateTime.of(2022, 1, 15, 15, 0), Duration.ofMinutes(120), "CodeTime", 50, activityManager.getEventIdList().get(0));
         activityManager.createActivity(LocalDateTime.of(2022, 1, 15, 15, 0), Duration.ofMinutes(240), "Codex", 20, activityManager.getEventIdList().get(0));
-        roomManager.bookRoom(roomManager.getListRoomId().get(1), activityManager.getActivitiesId().get(0));
-        roomManager.bookRoom(roomManager.getListRoomId().get(0), activityManager.getActivitiesId().get(1));
+
+        Room room1 = roomManager.findByName("Salle 102");
+        Room room2 = roomManager.findByName("Salle 101");
+
+        Activity act1 = activityRegistry.findByName("CodeTime");
+        Activity act2 = activityRegistry.findByName("Codex");
+
+        roomManager.bookRoom(room1, act1);
+        roomManager.bookRoom(room2, act2);
     }
 
     @Test

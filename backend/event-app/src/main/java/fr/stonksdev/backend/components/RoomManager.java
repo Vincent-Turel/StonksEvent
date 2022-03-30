@@ -3,6 +3,7 @@ package fr.stonksdev.backend.components;
 import fr.stonksdev.backend.entities.*;
 import fr.stonksdev.backend.exceptions.*;
 import fr.stonksdev.backend.interfaces.RoomBooking;
+import fr.stonksdev.backend.interfaces.RoomFinder;
 import fr.stonksdev.backend.interfaces.RoomModifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -11,7 +12,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-public class RoomManager implements RoomBooking, RoomModifier {
+public class RoomManager implements RoomBooking, RoomModifier, RoomFinder {
     private final List<UUID> listRoomId = new ArrayList<>();
 
     @Autowired
@@ -21,8 +22,11 @@ public class RoomManager implements RoomBooking, RoomModifier {
     private RoomPlanning roomPlanning;
 
     @Override
-    public boolean bookRoom(UUID roomId, UUID activityId) throws ActivityNotFoundException, RoomAlreadyBookedException {
+    public boolean bookRoom(Room room, Activity activity) throws ActivityNotFoundException, RoomAlreadyBookedException {
         boolean bookComplete = true;
+
+        UUID roomId = room.getId();
+        UUID activityId = activity.getActivityID();
 
         if (!inMemoryDatabase.getRoomPlanning().containsKey(roomId)) {
             List<UUID> newList = new ArrayList<>();
@@ -53,7 +57,10 @@ public class RoomManager implements RoomBooking, RoomModifier {
     }
 
     @Override
-    public boolean freeRoom(UUID roomId, UUID activityId) throws RoomIdNotFoundException {
+    public boolean freeRoom(Room room, Activity activity) throws RoomIdNotFoundException {
+        UUID roomId = room.getId();
+        UUID activityId = activity.getActivityID();
+
         if (!inMemoryDatabase.getRoomPlanning().containsKey(roomId)) {
             throw new RoomIdNotFoundException();
         }
@@ -76,11 +83,12 @@ public class RoomManager implements RoomBooking, RoomModifier {
     }
 
     @Override
-    public boolean modify(UUID roomId, Room newRoom) throws RoomIdNotFoundException {
+    public boolean modify(Room room, Room newRoom) throws RoomIdNotFoundException {
+        UUID roomId = room.getId();
+
         if (!inMemoryDatabase.getRooms().containsKey(roomId)) {
             throw new RoomIdNotFoundException();
         }
-        Room room = inMemoryDatabase.getRooms().get(roomId);
         room.setName(newRoom.getName());
         room.setRoomKind(newRoom.getRoomKind());
         room.setCapacity(newRoom.getCapacity());
@@ -88,7 +96,9 @@ public class RoomManager implements RoomBooking, RoomModifier {
     }
 
     @Override
-    public boolean delete(UUID roomId) throws RoomIdNotFoundException {
+    public boolean delete(Room room) throws RoomIdNotFoundException {
+        UUID roomId = room.getId();
+
         if (!inMemoryDatabase.getRooms().containsKey(roomId)) {
             throw new RoomIdNotFoundException();
         }
@@ -102,10 +112,10 @@ public class RoomManager implements RoomBooking, RoomModifier {
     }
 
     @Override
-    public List<TimeSlot> getPlanningOf(String eventName, String roomName) throws RoomIdNotFoundException, EventIdNotFoundException, RoomNotFoundException {
-        UUID eventId = getEventId(eventName);
+    public List<TimeSlot> getPlanningOf(StonksEvent event, Room room) throws RoomNotFoundException {
+        UUID eventId = event.getId();
         fillPlanningTable(eventId);
-        UUID roomId = getRoomId(roomName);
+        UUID roomId = room.getId();
 
         List<UUID> activityIDs = inMemoryDatabase.getRoomPlanning().get(roomId);
 
@@ -113,7 +123,7 @@ public class RoomManager implements RoomBooking, RoomModifier {
             return List.of();
         }
 
-        ArrayList<Activity> activities = new ArrayList<Activity>(activityIDs.size());
+        ArrayList<Activity> activities = new ArrayList<>(activityIDs.size());
 
         for (UUID activityId : activityIDs) {
             Activity activity = inMemoryDatabase.getActivities().get(activityId);
@@ -130,15 +140,16 @@ public class RoomManager implements RoomBooking, RoomModifier {
         return activities.stream().map(activity -> new TimeSlot(activity.getName(), activity.getBeginning(), activity.getDuration())).collect(Collectors.toList());
     }
 
-    public Map<String, List<TimeSlot>> getPlanningOf(String eventName) throws EventIdNotFoundException, ActivityNotFoundException, RoomIdNotFoundException, RoomNotFoundException {
-        UUID eventId = getEventId(eventName);
+    public Map<String, List<TimeSlot>> getPlanningOf(StonksEvent event) throws ActivityNotFoundException, RoomIdNotFoundException, RoomNotFoundException {
+        UUID eventId = event.getId();
+
         fillPlanningTable(eventId);
 
-        HashMap<String, List<TimeSlot>> assoc = new HashMap<String, List<TimeSlot>>();
+        HashMap<String, List<TimeSlot>> assoc = new HashMap<>();
 
         for (Map.Entry<UUID, List<UUID>> entry : inMemoryDatabase.getRoomPlanning().entrySet()) {
             UUID roomId = entry.getKey();
-            ArrayList<TimeSlot> activities = new ArrayList<TimeSlot>();
+            ArrayList<TimeSlot> activities = new ArrayList<>();
 
             for (UUID activityId : entry.getValue()) {
                 Activity activity = inMemoryDatabase.getActivities().get(activityId);
@@ -169,22 +180,17 @@ public class RoomManager implements RoomBooking, RoomModifier {
         inMemoryDatabase.getRooms().clear();
     }
 
-    private void fillPlanningTable(UUID eventId) throws EventIdNotFoundException, RoomNotFoundException {
+    private void fillPlanningTable(UUID eventId) throws RoomNotFoundException {
         Set<Activity> activities = inMemoryDatabase.getEventActivityAssociation().get(eventId);
 
         if (Objects.isNull(activities)) {
             // Having an empty slot here means that we have no associated
             // activity. That's ok.
             activities = new HashSet<>();
-            for (Activity activity : activities)
-                if (!aRoomIsBookedFor(activity)) {
-                    bookRoomFor(activity);
-                }
-        } else {
-            for (Activity activity : activities) {
-                if (!aRoomIsBookedFor(activity)) {
-                    bookRoomFor(activity);
-                }
+        }
+        for (Activity activity : activities) {
+            if (!aRoomIsBookedFor(activity)) {
+                bookRoomFor(activity);
             }
         }
 
@@ -233,5 +239,30 @@ public class RoomManager implements RoomBooking, RoomModifier {
                 .findFirst()
                 .map(Room::getId)
                 .orElseThrow(RoomIdNotFoundException::new);
+    }
+
+    @Override
+    public Optional<Room> findByNameFallible(String name) {
+        return inMemoryDatabase
+                .getRooms()
+                .values()
+                .stream()
+                .filter(room -> room.getName().equals(name))
+                .findFirst();
+    }
+
+    @Override
+    public Optional<Room> findByIdFallible(UUID id) {
+        return Optional.ofNullable(inMemoryDatabase.getRooms().get(id));
+    }
+
+    @Override
+    public Room findByName(String name) throws RoomIdNotFoundException {
+        return findByNameFallible(name).orElseThrow(RoomIdNotFoundException::new);
+    }
+
+    @Override
+    public Room findById(UUID id) throws RoomIdNotFoundException {
+        return findByIdFallible(id).orElseThrow(RoomIdNotFoundException::new);
     }
 }

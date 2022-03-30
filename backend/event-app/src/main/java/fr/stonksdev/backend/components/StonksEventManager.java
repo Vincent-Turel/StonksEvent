@@ -3,14 +3,11 @@ package fr.stonksdev.backend.components;
 import fr.stonksdev.backend.entities.Activity;
 import fr.stonksdev.backend.entities.Duration;
 import fr.stonksdev.backend.entities.StonksEvent;
-import fr.stonksdev.backend.exceptions.ActivityNotFoundException;
 import fr.stonksdev.backend.exceptions.AlreadyExistingEventException;
 import fr.stonksdev.backend.exceptions.EventIdNotFoundException;
-import fr.stonksdev.backend.interfaces.StonksEventFinder;
 import fr.stonksdev.backend.interfaces.Mail;
+import fr.stonksdev.backend.interfaces.StonksEventFinder;
 import fr.stonksdev.backend.interfaces.StonksEventModifier;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -35,7 +32,7 @@ public class StonksEventManager implements StonksEventModifier, StonksEventFinde
     @Override
     public StonksEvent createEvent(String name, int maxPeopleAmount, LocalDateTime startDate, LocalDateTime endDate) throws AlreadyExistingEventException {
         StonksEvent newEvent = new StonksEvent(name, maxPeopleAmount, startDate, endDate);
-        if (findByName(name).isPresent()) {
+        if (findByNameFallible(name).isPresent()) {
             throw new AlreadyExistingEventException(name);
         }
         inMemoryDatabase.getEvents().put(newEvent.getId(), newEvent);
@@ -48,15 +45,12 @@ public class StonksEventManager implements StonksEventModifier, StonksEventFinde
 
     @Override
     public StonksEvent updateEvent(UUID eventId, int maxPeopleAmount, LocalDateTime startDate, LocalDateTime endDate) throws EventIdNotFoundException {
-        Optional<StonksEvent> event = findById(eventId);
-        if (event.isEmpty()) {
-            throw new EventIdNotFoundException(eventId.toString());
-        }
-        StonksEvent stonksEvent = event.get();
-        stonksEvent.setAmountOfPeople(maxPeopleAmount);
-        stonksEvent.setStartDate(startDate);
-        stonksEvent.setEndDate(endDate);
-        return stonksEvent;
+        StonksEvent event = findById(eventId);
+
+        event.setAmountOfPeople(maxPeopleAmount);
+        event.setStartDate(startDate);
+        event.setEndDate(endDate);
+        return event;
     }
 
     /*
@@ -130,12 +124,7 @@ public class StonksEventManager implements StonksEventModifier, StonksEventFinde
      */
 
     @Override
-    public Activity updateActivity(UUID activityId, int maxPeopleAmount, LocalDateTime startDate, Duration duration) throws ActivityNotFoundException {
-        Optional<Activity> optActivity = findActivityById(activityId);
-        if (optActivity.isEmpty()) {
-            throw new ActivityNotFoundException();
-        }
-        Activity activity = optActivity.get();
+    public Activity updateActivity(Activity activity, int maxPeopleAmount, LocalDateTime startDate, Duration duration) {
         activity.setMaxPeopleAmount(maxPeopleAmount);
         activity.setBeginning(startDate);
         activity.setDuration(duration);
@@ -146,7 +135,9 @@ public class StonksEventManager implements StonksEventModifier, StonksEventFinde
     DELETE AN ACTIVITY
      */
     @Override
-    public void deleteActivity(UUID activityId) {
+    public void deleteActivity(Activity activity) {
+        UUID activityId = activity.getActivityID();
+
         inMemoryDatabase.getActivities().remove(activityId);
         activitiesId.remove(activityId);
     }
@@ -193,14 +184,29 @@ public class StonksEventManager implements StonksEventModifier, StonksEventFinde
     }
 
     @Override
-    public Optional<StonksEvent> findByName(String name) {
-        return inMemoryDatabase.getEvents().values().stream().filter(stonksEvent -> stonksEvent.getName().equals(name)).findFirst();
+    public Optional<StonksEvent> findByNameFallible(String name) {
+        return inMemoryDatabase
+                .getEvents()
+                .values()
+                .stream()
+                .filter(stonksEvent -> stonksEvent.getName().equals(name))
+                .findFirst();
     }
 
     @Override
-    public Optional<StonksEvent> findById(UUID id) {
+    public StonksEvent findByName(String name) throws EventIdNotFoundException {
+        return findByNameFallible(name).orElseThrow(EventIdNotFoundException::new);
+    }
+
+    @Override
+    public Optional<StonksEvent> findByIdFallible(UUID id) {
         StonksEvent event = inMemoryDatabase.getEvents().get(id);
         return Optional.ofNullable(event);
+    }
+
+    @Override
+    public StonksEvent findById(UUID id) throws EventIdNotFoundException {
+        return findByIdFallible(id).orElseThrow(EventIdNotFoundException::new);
     }
 
     private Optional<Activity> findActivityById(UUID id) {

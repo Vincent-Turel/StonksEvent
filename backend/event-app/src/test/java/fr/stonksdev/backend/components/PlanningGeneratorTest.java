@@ -71,20 +71,24 @@ public class PlanningGeneratorTest {
 
     @Test
     void eventWithNoActivityHasNoPlanning() throws Exception {
-        Map<String, List<TimeSlot>> planning = roomManager.getPlanningOf("atelier couture avec Bébert");
+        StonksEvent event = eventManager.findByName("atelier couture avec Bébert");
+        Map<String, List<TimeSlot>> planning = roomManager.getPlanningOf(event);
         assertEquals(planning.size(), 0);
     }
 
     @Test
     void eventWithActivitiesHasSomePlanning() throws Exception {
-        Map<String, List<TimeSlot>> planning = roomManager.getPlanningOf("La Nuit de l'Info");
+        StonksEvent event = eventManager.findByName("La Nuit de l'Info");
+        Map<String, List<TimeSlot>> planning = roomManager.getPlanningOf(event);
         long amountOfActivities = planning.values().stream().mapToLong(Collection::size).sum();
         assertEquals(amountOfActivities, 2);
     }
 
     @Test
     void activityNameMatches() throws Exception {
-        Stream<String> activities = roomManager.getPlanningOf("La Nuit de l'Info").values().stream().flatMap(Collection::stream).map(activity -> activity.activityName);
+        StonksEvent event = eventManager.findByName("La Nuit de l'Info");
+
+        Stream<String> activities = roomManager.getPlanningOf(event).values().stream().flatMap(Collection::stream).map(activity -> activity.activityName);
 
         activities.forEach(name -> assertTrue(availableActivities.contains(name)));
     }

@@ -9,8 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.UUID;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -45,16 +43,18 @@ public class RoomManagerTest {
 
     @Test
     void AlreadyExistingRoomExceptionTest() {
-        AlreadyExistingRoomException thrown = assertThrows(AlreadyExistingRoomException.class, () -> {
-            manager.create("Salle 103", RoomKind.Amphitheatre, 50);
-        });
+        AlreadyExistingRoomException thrown = assertThrows(AlreadyExistingRoomException.class, () ->
+                manager.create("Salle 103", RoomKind.Amphitheatre, 50)
+        );
         assertEquals(AlreadyExistingRoomException.class, thrown.getClass());
     }
 
     @Test
     void modifyTest() throws RoomIdNotFoundException {
-        Room room = new Room("Salle 104", RoomKind.Meeting, 50);
-        manager.modify(manager.getListRoomId().get(0), room);
+        Room room = manager.findByName("Salle 103");
+        Room newRoom = new Room("Salle 104", RoomKind.Meeting, 50);
+
+        manager.modify(room, newRoom);
         assertEquals(manager.getListRoomId().get(0), inMemoryDatabase.getRooms().get(manager.getListRoomId().get(0)).getId());
         assertEquals("Salle 104", inMemoryDatabase.getRooms().get(manager.getListRoomId().get(0)).getName());
         assertEquals(50, inMemoryDatabase.getRooms().get(manager.getListRoomId().get(0)).getCapacity());
@@ -64,24 +64,28 @@ public class RoomManagerTest {
     @Test
     void RoomIdNotFoundExceptionTestModify() {
         RoomIdNotFoundException thrown = assertThrows(RoomIdNotFoundException.class, () -> {
-            Room room = new Room("test", RoomKind.Classroom, 20);
-            manager.modify(new UUID(1, 1), room);
+            Room room = new Room("I don't exist", RoomKind.Amphitheatre, 200000);
+
+            Room newRoom = new Room("test", RoomKind.Classroom, 20);
+            manager.modify(room, newRoom);
         });
         assertEquals(RoomIdNotFoundException.class, thrown.getClass());
     }
 
     @Test
     void deleteTest() throws RoomIdNotFoundException {
-        manager.delete(manager.getListRoomId().get(0));
+        Room room = manager.findByName("Salle 103");
+
+        manager.delete(room);
         assertEquals(0, manager.getListRoomId().size());
         assertEquals(0, inMemoryDatabase.getRooms().size());
     }
 
     @Test
     void RoomIdNotFoundExceptionTestDelete() {
-        RoomIdNotFoundException thrown = assertThrows(RoomIdNotFoundException.class, () -> {
-            manager.delete(new UUID(1, 1));
-        });
+        Room fakeRoom = new Room("I do not exist", RoomKind.Meeting, 1);
+
+        RoomIdNotFoundException thrown = assertThrows(RoomIdNotFoundException.class, () -> manager.delete(fakeRoom));
         assertEquals(RoomIdNotFoundException.class, thrown.getClass());
     }
 }

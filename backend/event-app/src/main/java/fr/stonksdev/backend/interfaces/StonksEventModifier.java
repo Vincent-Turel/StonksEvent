@@ -1,7 +1,7 @@
 package fr.stonksdev.backend.interfaces;
 
-import fr.stonksdev.backend.entities.Duration;
 import fr.stonksdev.backend.entities.Activity;
+import fr.stonksdev.backend.entities.Duration;
 import fr.stonksdev.backend.entities.StonksEvent;
 import fr.stonksdev.backend.exceptions.ActivityNotFoundException;
 import fr.stonksdev.backend.exceptions.AlreadyExistingEventException;
@@ -28,9 +28,9 @@ public interface StonksEventModifier {
     Activity createActivity(LocalDateTime beginning, Duration duration, String name, int maxPeopleAmount, UUID eventId);
     Activity createActivity(LocalDateTime beginning, Duration duration, String name, UUID eventId);
 
-    Activity updateActivity(UUID activityId, int maxPeopleAmount, LocalDateTime startDate, Duration duration) throws ActivityNotFoundException;
+    Activity updateActivity(Activity activity, int maxPeopleAmount, LocalDateTime startDate, Duration duration) throws ActivityNotFoundException;
 
-    void deleteActivity(UUID activityId);
+    void deleteActivity(Activity activity);
 
     /*
     GETTER :
