@@ -100,5 +100,20 @@ pipeline {
                 }*/
             }
         }
+        stage('Launch on Docker') {
+            when {
+                anyOf {
+                    branch "developp"
+                }
+            }
+            steps {
+                sh '''
+                pushd ${env.WORKSPACE}/backend && chmod u+x build.sh && ./build.sh && popd
+                pushd ${env.WORKSPACE}/cli && chmod u+x build.sh && ./build.sh && popd
+                cd ${env.WORKSPACE}
+                docker-compose up -d
+                '''
+            }
+        }
      }
 }

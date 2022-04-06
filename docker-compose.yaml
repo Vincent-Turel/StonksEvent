@@ -1,0 +1,32 @@
+version: "3"
+
+services:
+  # StonksEvent backend in SpringBoot
+  backend-server:
+    image: stonksevent/spring-backend
+    container_name: server
+    #environment:
+    #  - MAIL_WITH_PORT=mail-system:9090
+    #entrypoint: "bash -c '/wait-for-it.sh $${MAIL_WITH_PORT} -- java -jar /app.jar --mail.host.baseurl=http://$${MAIL_WITH_PORT}'"
+    entrypoint: "java -jar /app.jar"
+    #depends_on:
+    #  - mail-system
+
+  # A simple java CLI
+  cli:
+    image: stonksevent/spring-cli
+    container_name: cli
+    environment:
+      - SERVER_WITH_PORT=backend-server:8080
+    entrypoint: "bash -c '/wait-for-it.sh $${SERVER_WITH_PORT} -- java -jar /app.jar'"
+    depends_on:
+      - backend-server
+    # volumes:
+      # - ./cli/demo.txt:/demo.txt
+    stdin_open: true
+    tty: true
+
+  # An external mail service in C#
+  #mail-system:
+  #  image: stonksevent/mail-service
+  #  container_name: mail
