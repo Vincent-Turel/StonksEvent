@@ -10,3 +10,6 @@ This project is composed of the following members:
 - Sasha Pourcelot ([@scrabsha](https://github.com/scrabsha)),
 - Thomas Di Grande ([@digrandearduino](https://github.com/digrandearduino)),
 - Vincent Turel ([@Vincent-Turel](https://github.com/Vincent-Turel/)).
+
+## The StonksEvent Project
+Work in progress ! (./wait_for_it)
