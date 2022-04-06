@@ -1,4 +1,4 @@
-Feature: EventCreation
+Feature: Event Creation
 
   This feature support the way an organizer can create a new event and its activities
 

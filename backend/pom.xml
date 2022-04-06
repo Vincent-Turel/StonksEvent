@@ -5,6 +5,8 @@
     <modules>
         <module>entities</module>
         <module>event-app</module>
+        <module>controllers</module>
+        <module>components</module>
     </modules>
 
     <groupId>fr.stonksdev.backend</groupId>
@@ -113,4 +115,14 @@
             </repositories>
         </profile>
     </profiles>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.plugins.version}</version>
+            </plugin>
+        </plugins>
+    </build>
 </project>

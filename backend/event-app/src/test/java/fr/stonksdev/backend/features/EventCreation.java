@@ -2,11 +2,11 @@ package fr.stonksdev.backend.features;
 
 import fr.stonksdev.backend.components.InMemoryDatabase;
 import fr.stonksdev.backend.components.StonksEventManager;
+import fr.stonksdev.backend.components.interfaces.Mail;
+import fr.stonksdev.backend.components.exceptions.AlreadyExistingEventException;
+import fr.stonksdev.backend.components.exceptions.EventIdNotFoundException;
 import fr.stonksdev.backend.entities.Duration;
 import fr.stonksdev.backend.entities.StonksEvent;
-import fr.stonksdev.backend.exceptions.AlreadyExistingEventException;
-import fr.stonksdev.backend.exceptions.EventIdNotFoundException;
-import fr.stonksdev.backend.interfaces.Mail;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -28,9 +28,9 @@ import static org.mockito.Mockito.when;
 public class EventCreation {
 
     @Autowired
-    InMemoryDatabase inMemoryDatabase;
+    private InMemoryDatabase inMemoryDatabase;
     @Autowired
-    StonksEventManager eventManager;
+    private StonksEventManager eventManager;
 
     @Autowired
     @MockBean

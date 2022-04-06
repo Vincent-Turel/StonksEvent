@@ -19,7 +19,7 @@
     <dependencies>
         <dependency>
             <groupId>fr.stonksdev.backend</groupId>
-            <artifactId>entities</artifactId>
+            <artifactId>controllers</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
