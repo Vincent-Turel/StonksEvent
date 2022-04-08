@@ -124,6 +124,8 @@ pipeline {
             }
             steps {
                 sh '''
+                docker stop cli
+                docker stop server
                 chmod u+x launch_everything.sh
                 ./launch_everything.sh
                 '''
