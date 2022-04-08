@@ -28,6 +28,8 @@ pipeline {
         stage('Testing unstable') {
             when {
                 anyOf {
+                    changeset "components/**"
+                    changeset "controllers/**"
                     changeset "entities/**"
                     changeset "event-app/**"
                 }
@@ -56,7 +58,21 @@ pipeline {
                 }
             }
         }
-        /*stage('Build controllers - dev') {
+        stage('Build components - dev') {
+            environment {
+                MODULE = "components"
+            }
+            when {
+                expression { env.BRANCH_NAME == 'develop' }
+            }
+            steps {
+                echo "Building components develop"
+                dir("${env.WORKSPACE}/backend"){
+                    script { deploy_module() }
+                }
+            }
+        }
+        stage('Build controllers - dev') {
             environment {
                 MODULE = "controllers"
             }
@@ -69,7 +85,7 @@ pipeline {
                     script { deploy_module() }
                 }
             }
-        }*/
+        }
         stage('Build event-app - dev') {
             environment {
                 MODULE = "event-app"
