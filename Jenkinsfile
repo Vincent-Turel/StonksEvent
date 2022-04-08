@@ -124,9 +124,9 @@ pipeline {
             }
             steps {
                 sh '''
-                pushd ${env.WORKSPACE}/backend && chmod u+x build.sh && ./build.sh && popd
-                pushd ${env.WORKSPACE}/cli && chmod u+x build.sh && ./build.sh && popd
-                cd ${env.WORKSPACE}
+                pushd ${WORKSPACE}/backend && chmod u+x build.sh && ./build.sh && popd
+                pushd ${WORKSPACE}/cli && chmod u+x build.sh && ./build.sh && popd
+                cd ${WORKSPACE}
                 docker-compose up -d
                 '''
             }
