@@ -119,7 +119,7 @@ pipeline {
         stage('Launch on Docker') {
             when {
                 anyOf {
-                    branch "developp"
+                    branch "develop"
                 }
             }
             steps {
