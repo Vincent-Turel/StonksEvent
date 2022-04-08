@@ -124,10 +124,8 @@ pipeline {
             }
             steps {
                 sh '''
-                cd ${WORKSPACE}/backend && chmod u+x build.sh && ./build.sh
-                cd ${WORKSPACE}/cli && chmod u+x build.sh && ./build.sh
-                cd ${WORKSPACE}
-                docker-compose up -d
+                chmod u+x launch_everything.sh
+                ./launch_everything.sh
                 '''
             }
         }
