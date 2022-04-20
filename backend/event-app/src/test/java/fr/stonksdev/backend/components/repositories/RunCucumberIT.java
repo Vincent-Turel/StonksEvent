@@ -1,4 +1,4 @@
-package fr.stonksdev.backend.repositories;
+package fr.stonksdev.backend.components.repositories;
 
 import org.junit.platform.suite.api.*;
 

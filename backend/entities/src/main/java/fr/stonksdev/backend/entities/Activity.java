@@ -1,47 +1,60 @@
 package fr.stonksdev.backend.entities;
 
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.Objects;
-import java.util.UUID;
 
+@Entity
 public class Activity {
-    private LocalDateTime beginning;
-    private Duration duration;
+
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    @NotNull
+    @NotBlank
+    @Column(unique = true)
     private String name;
-    private String description;
+
+    @NotNull
+    private LocalDateTime beginning;
+
+    @Embedded
+    private Duration duration;
+
+    @NotNull
     private int maxPeopleAmount;
-    private final UUID eventUUID;
-    private final UUID activityID;
 
-    public Activity(LocalDateTime beginning, Duration duration, String name, String description, int maxPeopleAmount, UUID eventUUID) {
+    @ManyToOne
+    private StonksEvent event;
+
+    @ManyToOne
+    private Room room;
+
+    public Activity(LocalDateTime beginning, Duration duration, String name, int maxPeopleAmount, StonksEvent event) {
         this.beginning = beginning;
         this.duration = duration;
         this.name = name;
-        this.description = description;
         this.maxPeopleAmount = maxPeopleAmount;
-        this.eventUUID = eventUUID;
-        this.activityID = UUID.randomUUID();
+        this.event = event;
     }
 
-    public Activity(LocalDateTime beginning, Duration duration, String name, int maxPeopleAmount, UUID eventUUID) {
+    public Activity(LocalDateTime beginning, Duration duration, String name, StonksEvent event) {
         this.beginning = beginning;
         this.duration = duration;
         this.name = name;
-        this.description = "";
-        this.maxPeopleAmount = maxPeopleAmount;
-        this.eventUUID = eventUUID;
-        this.activityID = UUID.randomUUID();
-    }
-
-    public Activity(LocalDateTime beginning, Duration duration, String name, UUID eventUUID) {
-        this.beginning = beginning;
-        this.duration = duration;
-        this.name = name;
-        this.description = "";
         this.maxPeopleAmount = 9999;
-        this.eventUUID = eventUUID;
-        this.activityID = UUID.randomUUID();
+        this.event = event;
+    }
+
+    public Activity() {
+
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public LocalDateTime getEndDate(){
@@ -72,14 +85,6 @@ public class Activity {
         this.name = newName;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String newDescription) {
-        this.description = newDescription;
-    }
-
     public int getMaxPeopleAmount() {
         return maxPeopleAmount;
     }
@@ -88,12 +93,24 @@ public class Activity {
         this.maxPeopleAmount = newMaxPeopleAmount;
     }
 
-    public UUID getEventId() {
-        return this.eventUUID;
+    public StonksEvent getEvent() {
+        return event;
     }
 
-    public UUID getActivityID() {
-        return this.activityID;
+    public void setEvent(StonksEvent event) {
+        this.event = event;
+    }
+
+    public Room getRoom() {
+        return room;
+    }
+
+    public void setRoom(Room room) {
+        this.room = room;
+    }
+
+    public TimeSlot generateTimeSlot() {
+        return new TimeSlot(name, beginning, duration);
     }
 
     @Override
@@ -103,14 +120,12 @@ public class Activity {
         Activity that = (Activity) o;
         return getMaxPeopleAmount() == that.getMaxPeopleAmount()
                 && Objects.equals(getName(), that.getName())
-                && Objects.equals(getEventId(), that.getEventId())
-                && Objects.equals(getDescription(), that.getDescription())
                 && Objects.equals(getDuration(), that.getDuration())
                 && Objects.equals(getBeginning(), that.getBeginning());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(), getBeginning(), getEventId(), getDescription(), getDuration(), getMaxPeopleAmount());
+        return Objects.hash(getName(), getBeginning(), getDuration(), getMaxPeopleAmount());
     }
 }

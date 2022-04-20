@@ -12,7 +12,6 @@ import org.springframework.web.client.RestTemplate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.UUID;
 
 @ShellComponent
 public class ActivityCommand {
@@ -20,7 +19,6 @@ public class ActivityCommand {
     private static final String ACTIVITY_URI = "/activities";
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-
 
     @Autowired
     RestTemplate restTemplate;
@@ -34,7 +32,7 @@ public class ActivityCommand {
         if (!cliContext.getEvents().containsKey(eventName)) {
             throw new EventDoesNotExistException("The event '" + eventName + "' does not exist, please, use this command for only an existing event.");
         }
-        UUID eventId = cliContext.getEvents().get(eventName).id;
+        Long eventId = cliContext.getEvents().get(eventName).id;
         Activity activity = restTemplate.postForObject(BASE_URI + "/" + eventId + ACTIVITY_URI, new Activity(startDate, Duration.ofMinutes(duration), activityName, nbPeople), Activity.class);
         cliContext.getActivities().put(activityName, activity);
         return activity;
@@ -49,8 +47,8 @@ public class ActivityCommand {
         if (!cliContext.getActivities().containsKey(activityName)) {
             throw new Exception("The activity '" + activityName + "' does not exist, please, use this command for only an existing activity.");
         }
-        UUID eventId = cliContext.getEvents().get(eventName).id;
-        UUID activityId = cliContext.getActivities().get(activityName).id;
+        Long eventId = cliContext.getEvents().get(eventName).id;
+        Long activityId = cliContext.getActivities().get(activityName).id;
         Activity activity = restTemplate.postForObject(BASE_URI + "/" + eventId + ACTIVITY_URI + "/" + activityId, new Activity(startDate, Duration.ofMinutes(duration), activityName, nbPeople), Activity.class);
         cliContext.getActivities().put(activityName, activity);
         return activity;
@@ -61,7 +59,7 @@ public class ActivityCommand {
         if (!cliContext.getEvents().containsKey(eventName)) {
             throw new Exception("The event '" + eventName + "' does not exist, please, use this command for only an existing event.");
         }
-        UUID eventId = cliContext.getEvents().get(eventName).id;
+        Long eventId = cliContext.getEvents().get(eventName).id;
         return restTemplate.getForObject(BASE_URI + "/" + eventId + ACTIVITY_URI, String.class);
     }
 

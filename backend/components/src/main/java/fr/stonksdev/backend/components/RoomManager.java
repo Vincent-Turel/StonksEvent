@@ -4,131 +4,79 @@ import fr.stonksdev.backend.components.exceptions.*;
 import fr.stonksdev.backend.components.interfaces.RoomBooking;
 import fr.stonksdev.backend.components.interfaces.RoomFinder;
 import fr.stonksdev.backend.components.interfaces.RoomModifier;
+import fr.stonksdev.backend.components.repositories.RoomRepository;
 import fr.stonksdev.backend.entities.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
 public class RoomManager implements RoomBooking, RoomModifier, RoomFinder {
-    private final List<UUID> listRoomId = new ArrayList<>();
 
     @Autowired
-    private InMemoryDatabase inMemoryDatabase;
-
-    @Autowired
-    private RoomPlanning roomPlanning;
+    private RoomRepository roomRepo;
 
     @Override
-    public boolean bookRoom(Room room, Activity activity) throws ActivityNotFoundException, RoomAlreadyBookedException {
-        boolean bookComplete = true;
+    public boolean bookRoom(Room room, Activity activity) throws RoomAlreadyBookedException {
+        Set<Activity> activities = room.getActivities();
 
-        UUID roomId = room.getId();
-        UUID activityId = activity.getActivityID();
-
-        if (!inMemoryDatabase.getRoomPlanning().containsKey(roomId)) {
-            List<UUID> newList = new ArrayList<>();
-            inMemoryDatabase.getRoomPlanning().put(roomId, newList);
-        }
-
-        if (!inMemoryDatabase.getRoomPlanning().isEmpty()) {
-            List<UUID> activityIdList = inMemoryDatabase.getRoomPlanning().get(roomId);
-            if (activityIdList.contains(activityId)) {
-                throw new RoomAlreadyBookedException();
-            }
-            if (!inMemoryDatabase.getActivities().containsKey(activityId)) {
-                throw new ActivityNotFoundException();
-            }
-            for (UUID value : activityIdList) {
-                if (!inMemoryDatabase.getActivities().get(value).getEndDate().isBefore(inMemoryDatabase.getActivities().get(activityId).getBeginning())) {
-                    bookComplete = false;
-                }
-            }
-        }
-
-        if (bookComplete) {
-            inMemoryDatabase.getRoomPlanning().get(roomId).add(activityId);
-            return bookComplete;
-        } else {
+        if (activities.contains(activity))
             throw new RoomAlreadyBookedException();
+
+        for (Activity act : activities) {
+            if (act.getEndDate().isAfter(activity.getBeginning()) || act.getBeginning().isBefore(activity.getEndDate()))
+                return false;
         }
+        room.addActivity(activity);
+        return true;    
     }
 
     @Override
-    public boolean freeRoom(Room room, Activity activity) throws RoomIdNotFoundException {
-        UUID roomId = room.getId();
-        UUID activityId = activity.getActivityID();
-
-        if (!inMemoryDatabase.getRoomPlanning().containsKey(roomId)) {
-            throw new RoomIdNotFoundException();
-        }
-        return inMemoryDatabase.getRoomPlanning().get(roomId).remove(activityId);
+    public boolean freeRoom(Room room, Activity activity) {
+        return room.getActivities().remove(activity);
     }
 
     @Override
-    public boolean create(String name, RoomKind roomKind, int capacity) throws AlreadyExistingRoomException {
-        if (!inMemoryDatabase.getRooms().isEmpty()) {
-            for (Map.Entry<UUID, Room> item : inMemoryDatabase.getRooms().entrySet()) {
-                if (item.getValue().getName().equals(name)) {
-                    throw new AlreadyExistingRoomException();
-                }
-            }
-        }
+    @Transactional
+    public Room create(String name, RoomKind roomKind, int capacity) throws AlreadyExistingRoomException {
         Room newRoom = new Room(name, roomKind, capacity);
-        inMemoryDatabase.getRooms().put(newRoom.getId(), newRoom);
-        listRoomId.add(newRoom.getId());
-        return true;
+        roomRepo.save(newRoom);
+        return newRoom;
     }
 
     @Override
-    public boolean modify(Room room, Room newRoom) throws RoomIdNotFoundException {
-        UUID roomId = room.getId();
-
-        if (!inMemoryDatabase.getRooms().containsKey(roomId)) {
-            throw new RoomIdNotFoundException();
+    @Transactional
+    public Room modify(Long roomId, Room newRoom) throws RoomNotFoundException {
+        Optional<Room> roomOpt = findById(roomId);
+        if (roomOpt.isEmpty()) {
+            throw new RoomNotFoundException(roomId.toString());
         }
+        Room room = roomOpt.get();
         room.setName(newRoom.getName());
         room.setRoomKind(newRoom.getRoomKind());
         room.setCapacity(newRoom.getCapacity());
-        return true;
+        return roomRepo.save(room);
     }
 
     @Override
-    public boolean delete(Room room) throws RoomIdNotFoundException {
-        UUID roomId = room.getId();
-
-        if (!inMemoryDatabase.getRooms().containsKey(roomId)) {
-            throw new RoomIdNotFoundException();
-        }
-        listRoomId.remove(roomId);
-        inMemoryDatabase.getRooms().remove(roomId);
-        return true;
-    }
-
-    public List<UUID> getListRoomId() {
-        return listRoomId;
+    @Transactional
+    public void delete(Room room) {
+        roomRepo.delete(room);
     }
 
     @Override
     public List<TimeSlot> getPlanningOf(StonksEvent event, Room room) throws RoomNotFoundException {
-        UUID eventId = event.getId();
-        fillPlanningTable(eventId);
-        UUID roomId = room.getId();
+        fillPlanningTable(event);
 
-        List<UUID> activityIDs = inMemoryDatabase.getRoomPlanning().get(roomId);
+        List<Activity> roomActivities = new ArrayList<>(room.getActivities());
 
-        if (Objects.isNull(activityIDs)) {
-            return List.of();
-        }
+        List<Activity> activities = new ArrayList<>(roomActivities.size());
 
-        ArrayList<Activity> activities = new ArrayList<>(activityIDs.size());
-
-        for (UUID activityId : activityIDs) {
-            Activity activity = inMemoryDatabase.getActivities().get(activityId);
-
-            if (Objects.isNull(activity) || activity.getEventId().equals(eventId)) {
+        for (Activity activity : roomActivities) {
+            if (Objects.isNull(activity) || activity.getEvent().equals(event)) {
                 continue;
             }
 
@@ -140,32 +88,17 @@ public class RoomManager implements RoomBooking, RoomModifier, RoomFinder {
         return activities.stream().map(activity -> new TimeSlot(activity.getName(), activity.getBeginning(), activity.getDuration())).collect(Collectors.toList());
     }
 
-    public Map<String, List<TimeSlot>> getPlanningOf(StonksEvent event) throws ActivityNotFoundException, RoomIdNotFoundException, RoomNotFoundException {
-        UUID eventId = event.getId();
+    public Map<String, List<TimeSlot>> getPlanningOf(StonksEvent event) throws RoomNotFoundException {
+        fillPlanningTable(event);
 
-        fillPlanningTable(eventId);
+        Map<String, List<TimeSlot>> assoc = new HashMap<>();
 
-        HashMap<String, List<TimeSlot>> assoc = new HashMap<>();
+        for (Room room : roomRepo.findAll()) {
+            List<TimeSlot> activities = new ArrayList<>();
 
-        for (Map.Entry<UUID, List<UUID>> entry : inMemoryDatabase.getRoomPlanning().entrySet()) {
-            UUID roomId = entry.getKey();
-            ArrayList<TimeSlot> activities = new ArrayList<>();
-
-            for (UUID activityId : entry.getValue()) {
-                Activity activity = inMemoryDatabase.getActivities().get(activityId);
-
-                if (Objects.isNull(activity)) {
-                    throw new ActivityNotFoundException();
-                }
-
-                TimeSlot timeSlot = new TimeSlot(activity.getName(), activity.getBeginning(), activity.getDuration());
+            for (Activity activity : room.getActivities()) {
+                TimeSlot timeSlot = activity.generateTimeSlot();
                 activities.add(timeSlot);
-            }
-
-            Room room = inMemoryDatabase.getRooms().get(roomId);
-
-            if (Objects.isNull(room)) {
-                throw new RoomIdNotFoundException();
             }
 
             assoc.put(room.getName(), activities);
@@ -174,95 +107,35 @@ public class RoomManager implements RoomBooking, RoomModifier, RoomFinder {
         return assoc;
     }
 
-    public void reset() {
-        listRoomId.clear();
-        inMemoryDatabase.getRoomPlanning().clear();
-        inMemoryDatabase.getRooms().clear();
-    }
-
-    private void fillPlanningTable(UUID eventId) throws RoomNotFoundException {
-        Set<Activity> activities = inMemoryDatabase.getEventActivityAssociation().get(eventId);
-
-        if (Objects.isNull(activities)) {
-            // Having an empty slot here means that we have no associated
-            // activity. That's ok.
-            activities = new HashSet<>();
-        }
+    private void fillPlanningTable(StonksEvent event) throws RoomNotFoundException {
+        Set<Activity> activities = event.getActivities();
         for (Activity activity : activities) {
             if (!aRoomIsBookedFor(activity)) {
                 bookRoomFor(activity);
             }
         }
-
     }
 
     private boolean aRoomIsBookedFor(Activity activity) {
-        return inMemoryDatabase
-                .getRoomPlanning()
-                .values()
+        return roomRepo.findAll()
                 .stream()
-                .flatMap(Collection::stream)
-                .anyMatch(id -> id.equals(activity.getActivityID()));
+                .anyMatch(room -> room.getActivities().contains(activity));
     }
 
     private void bookRoomFor(Activity activity) throws RoomNotFoundException {
-        UUID roomId = inMemoryDatabase.getRooms().keySet().stream().findFirst().orElseThrow(RoomNotFoundException::new);
+        // TODO add complexity (don't just get first room)
+        Room room = roomRepo.findAll().stream().findFirst().orElseThrow(RoomNotFoundException::new);
 
-        if (!inMemoryDatabase.getRoomPlanning().containsKey(roomId)) {
-            inMemoryDatabase.getRoomPlanning().put(roomId, new ArrayList<>());
-        }
-
-        // This can not be null because we have checked for such case in the
-        // previous statement.
-        List<UUID> roomActivities = inMemoryDatabase.getRoomPlanning().get(roomId);
-
-        roomActivities.add(activity.getActivityID());
-    }
-
-    private UUID getEventId(String eventName) throws EventIdNotFoundException {
-        return inMemoryDatabase
-                .getEvents()
-                .values()
-                .stream()
-                .filter(event -> event.getName().equals(eventName))
-                .findFirst()
-                .map(StonksEvent::getId)
-                .orElseThrow(EventIdNotFoundException::new);
-    }
-
-    private UUID getRoomId(String roomName) throws RoomIdNotFoundException {
-        return inMemoryDatabase
-                .getRooms()
-                .values()
-                .stream()
-                .filter(room -> room.getName().equals(roomName))
-                .findFirst()
-                .map(Room::getId)
-                .orElseThrow(RoomIdNotFoundException::new);
+        room.addActivity(activity);
     }
 
     @Override
-    public Optional<Room> findByNameFallible(String name) {
-        return inMemoryDatabase
-                .getRooms()
-                .values()
-                .stream()
-                .filter(room -> room.getName().equals(name))
-                .findFirst();
+    public Optional<Room> findByName(String name) {
+        return roomRepo.findRoomByName(name);
     }
 
     @Override
-    public Optional<Room> findByIdFallible(UUID id) {
-        return Optional.ofNullable(inMemoryDatabase.getRooms().get(id));
-    }
-
-    @Override
-    public Room findByName(String name) throws RoomIdNotFoundException {
-        return findByNameFallible(name).orElseThrow(RoomIdNotFoundException::new);
-    }
-
-    @Override
-    public Room findById(UUID id) throws RoomIdNotFoundException {
-        return findByIdFallible(id).orElseThrow(RoomIdNotFoundException::new);
+    public Optional<Room> findById(Long id) {
+        return roomRepo.findById(id);
     }
 }

@@ -1,24 +1,20 @@
 package fr.stonksdev.backend.controllers;
 
-import fr.stonksdev.backend.components.InMemoryDatabase;
 import fr.stonksdev.backend.components.StonksEventManager;
-import fr.stonksdev.backend.components.exceptions.ActivityNotFoundException;
 import fr.stonksdev.backend.components.exceptions.AlreadyExistingEventException;
-import fr.stonksdev.backend.components.exceptions.EventIdNotFoundException;
-import fr.stonksdev.backend.entities.Activity;
-import fr.stonksdev.backend.entities.StonksEvent;
-import fr.stonksdev.backend.entities.dto.ActivtyDTO;
+import fr.stonksdev.backend.components.exceptions.EventNotFoundException;
+import fr.stonksdev.backend.components.interfaces.StonksEventFinder;
 import fr.stonksdev.backend.entities.dto.ErrorDTO;
 import fr.stonksdev.backend.entities.dto.StonksEventDTO;
+import fr.stonksdev.backend.entities.Activity;
+import fr.stonksdev.backend.entities.StonksEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -30,14 +26,15 @@ public class StonksEventController {
     public static final String EVENT_URI = EVENTS_URI + "/{eventId}";
     public static final String ACTIVITY_URI = EVENT_URI + "/activities";
 
+
     @Autowired
     private StonksEventManager eventManager;
 
     @Autowired
-    private InMemoryDatabase inMemoryDatabase;
+    private Finder finder;
 
-    @ExceptionHandler({EventIdNotFoundException.class})
-    public ResponseEntity<ErrorDTO> handleExceptions(EventIdNotFoundException e) {
+    @ExceptionHandler({EventNotFoundException.class})
+    public ResponseEntity<ErrorDTO> handleExceptions(EventNotFoundException e) {
         ErrorDTO errorDTO = new ErrorDTO();
         errorDTO.setError("The event does not exist");
         errorDTO.setDetails(e.getName() + " is not a existing Id for an event");
@@ -60,32 +57,9 @@ public class StonksEventController {
     }
 
     @PostMapping(path = EVENT_URI, consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<StonksEventDTO> updateEvent(@PathVariable("eventId") UUID eventId, @RequestBody StonksEventDTO eventDTO) throws EventIdNotFoundException {
+    public ResponseEntity<StonksEventDTO> updateEvent(@PathVariable("eventId") Long eventId, @RequestBody StonksEventDTO eventDTO) throws EventNotFoundException {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(convertEventToDto(eventManager.updateEvent(eventId, eventDTO.amountOfPeople, eventDTO.startDate, eventDTO.endDate)));
-    }
-
-    @PostMapping(path = ACTIVITY_URI, consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<ActivtyDTO> registerActivity(@PathVariable("eventId") UUID eventId, @RequestBody ActivtyDTO activtyDTO) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(convertActivityToDto(eventManager.createActivity(activtyDTO.getBeginning(), activtyDTO.getDuration(), activtyDTO.getName(), eventId)));
-    }
-
-    @PostMapping(path = ACTIVITY_URI + "/{activityId}", consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<ActivtyDTO> updateActivity(@PathVariable("activityId") UUID activityId, @RequestBody ActivtyDTO activtyDTO) throws ActivityNotFoundException {
-        Activity activity = inMemoryDatabase.getActivities().get(activityId);
-
-        if (Objects.isNull(activity)) {
-            throw new ActivityNotFoundException();
-        }
-
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(convertActivityToDto(eventManager.updateActivity(activity, activtyDTO.getMaxPeopleAmount(), activtyDTO.getBeginning(), activtyDTO.getDuration())));
-    }
-
-    @GetMapping(ACTIVITY_URI)
-    public ResponseEntity<Set<Activity>> getAllActivitiesFromEvent(@PathVariable("eventId") UUID eventId) {
-        return ResponseEntity.ok(new HashSet<>(eventManager.getAllActivitiesFromEvent(eventId)));
     }
 
     private StonksEventDTO convertEventToDto(StonksEvent event) {
@@ -94,9 +68,8 @@ public class StonksEventController {
         return eventDTO;
     }
 
-    private ActivtyDTO convertActivityToDto(Activity activity) {
-        ActivtyDTO activityDTO = new ActivtyDTO(activity.getName(), activity.getMaxPeopleAmount(), activity.getDescription(), activity.getBeginning(), activity.getDuration());
-        activityDTO.setId(activity.getActivityID());
-        return activityDTO;
+    @GetMapping(ACTIVITY_URI)
+    public ResponseEntity<Set<Activity>> getAllActivitiesFromEvent(@PathVariable("eventId") Long eventId) throws EventNotFoundException {
+        return ResponseEntity.ok(new HashSet<>(eventManager.getAllActivitiesFromEvent(finder.retrieveEvent(eventId))));
     }
 }

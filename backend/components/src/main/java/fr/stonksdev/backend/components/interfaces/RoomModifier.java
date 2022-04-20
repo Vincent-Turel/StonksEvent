@@ -1,6 +1,9 @@
 package fr.stonksdev.backend.components.interfaces;
 
-import fr.stonksdev.backend.components.exceptions.*;
+import fr.stonksdev.backend.components.exceptions.ActivityNotFoundException;
+import fr.stonksdev.backend.components.exceptions.AlreadyExistingRoomException;
+import fr.stonksdev.backend.components.exceptions.EventNotFoundException;
+import fr.stonksdev.backend.components.exceptions.RoomNotFoundException;
 import fr.stonksdev.backend.entities.Room;
 import fr.stonksdev.backend.entities.RoomKind;
 import fr.stonksdev.backend.entities.StonksEvent;
@@ -10,13 +13,13 @@ import java.util.List;
 import java.util.Map;
 
 public interface RoomModifier {
-    boolean create(String name, RoomKind roomKind, int capacity) throws AlreadyExistingRoomException;
+    Room create(String name, RoomKind roomKind, int capacity) throws AlreadyExistingRoomException;
 
-    boolean modify(Room room, Room newRoom) throws AlreadyExistingRoomException, RoomIdNotFoundException;
+    Room modify(Long roomId, Room newRoom) throws AlreadyExistingRoomException, RoomNotFoundException;
 
-    boolean delete(Room room) throws RoomIdNotFoundException;
+    void delete(Room room) throws RoomNotFoundException;
 
-    List<TimeSlot> getPlanningOf(StonksEvent event, Room room) throws EventIdNotFoundException, RoomIdNotFoundException, RoomNotFoundException;
+    List<TimeSlot> getPlanningOf(StonksEvent event, Room room) throws EventNotFoundException, RoomNotFoundException;
 
-    Map<String, List<TimeSlot>> getPlanningOf(StonksEvent event) throws EventIdNotFoundException, RoomIdNotFoundException, ActivityNotFoundException, RoomNotFoundException;
+    Map<String, List<TimeSlot>> getPlanningOf(StonksEvent event) throws EventNotFoundException, RoomNotFoundException, ActivityNotFoundException;
 }

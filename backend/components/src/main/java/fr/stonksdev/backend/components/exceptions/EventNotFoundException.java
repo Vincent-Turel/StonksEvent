@@ -1,6 +1,6 @@
 package fr.stonksdev.backend.components.exceptions;
 
-public class EventIdNotFoundException extends Exception {
+public class EventNotFoundException extends Exception {
     private String name;
 
     public String getName() {
@@ -11,10 +11,10 @@ public class EventIdNotFoundException extends Exception {
         this.name = name;
     }
 
-    public EventIdNotFoundException() {
+    public EventNotFoundException() {
     }
 
-    public EventIdNotFoundException(String customerName) {
+    public EventNotFoundException(String customerName) {
         this.name = customerName;
     }
 }

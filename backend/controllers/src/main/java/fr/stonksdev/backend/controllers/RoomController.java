@@ -1,11 +1,7 @@
 package fr.stonksdev.backend.controllers;
 
-import fr.stonksdev.backend.components.InMemoryDatabase;
 import fr.stonksdev.backend.components.RoomManager;
-import fr.stonksdev.backend.components.StonksEventManager;
-import fr.stonksdev.backend.components.exceptions.ActivityNotFoundException;
-import fr.stonksdev.backend.components.exceptions.EventIdNotFoundException;
-import fr.stonksdev.backend.components.exceptions.RoomIdNotFoundException;
+import fr.stonksdev.backend.components.exceptions.EventNotFoundException;
 import fr.stonksdev.backend.components.exceptions.RoomNotFoundException;
 import fr.stonksdev.backend.entities.Room;
 import fr.stonksdev.backend.entities.StonksEvent;
@@ -27,18 +23,14 @@ class RoomController {
     private RoomManager roomManager;
 
     @Autowired
-    private StonksEventManager stonksEventManager;
-
-    @Autowired
-    private InMemoryDatabase inMemoryDatabase;
+    private Finder finder;
 
     @GetMapping(EVENT_URI + "/{eventName}/{roomName}")
     public ResponseEntity<List<TimeSlot>> planningForRoom(
             @PathVariable("eventName") String eventName,
-            @PathVariable("roomName") String roomName
-    ) throws EventIdNotFoundException, RoomIdNotFoundException, RoomNotFoundException {
-        StonksEvent event = stonksEventManager.findByName(eventName);
-        Room room = roomManager.findByName(roomName);
+            @PathVariable("roomName") String roomName) throws RoomNotFoundException, EventNotFoundException {
+        StonksEvent event = finder.retrieveEvent(eventName);
+        Room room = finder.retrieveRoom(roomName);
 
         List<TimeSlot> output = roomManager.getPlanningOf(event, room);
         return ResponseEntity.ok(output);
@@ -47,8 +39,8 @@ class RoomController {
     @GetMapping(EVENT_URI + "/{eventName}")
     public ResponseEntity<Map<String, List<TimeSlot>>> planningForAllRooms(
             @PathVariable("eventName") String eventName
-    ) throws EventIdNotFoundException, RoomIdNotFoundException, ActivityNotFoundException, RoomNotFoundException {
-        StonksEvent event = stonksEventManager.findByName(eventName);
+    ) throws RoomNotFoundException, EventNotFoundException {
+        StonksEvent event = finder.retrieveEvent(eventName);
 
         Map<String, List<TimeSlot>> output = roomManager.getPlanningOf(event);
         return ResponseEntity.ok(output);

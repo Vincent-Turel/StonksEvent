@@ -43,7 +43,7 @@ public class EventCommand {
         if (!cliContext.getEvents().containsKey(name)) {
             throw new Exception("The event '" + name + "' does not exist, please, use this command for only an existing event.");
         }
-        UUID eventId = cliContext.getEvents().get(name).id;
+        Long eventId = cliContext.getEvents().get(name).id;
         StonksEvent event = restTemplate.postForObject(BASE_URI + "/" + eventId, new StonksEvent(name, poepleNb, startDate, endDate), StonksEvent.class);
         cliContext.getEvents().put(name, event);
         return event;

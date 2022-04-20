@@ -2,6 +2,10 @@ package fr.stonksdev.backend.entities;
 
 import com.fasterxml.jackson.annotation.*;
 
+import javax.persistence.Embeddable;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import java.util.Objects;
 
 /**
@@ -23,9 +27,15 @@ import java.util.Objects;
  * </ul>
  */
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+@Embeddable
 public class Duration implements Comparable<Duration> {
+
     // Invariant: must be <= 0.
     private final int minutes;
+
+    public Duration() {
+        minutes = 0;
+    }
 
     @JsonCreator
     public static Duration ofMinutes(@JsonProperty("minutes") int minutes) {

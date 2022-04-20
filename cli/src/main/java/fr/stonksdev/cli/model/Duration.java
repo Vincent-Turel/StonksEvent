@@ -26,6 +26,7 @@ import java.util.Objects;
  */
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class Duration implements Comparable<Duration> {
+    private Long id;
     // Invariant: must be <= 0.
     private final int minutes;
 

@@ -9,7 +9,7 @@ public class StonksEvent {
     public int amountOfPeople;
     public LocalDateTime startDate;
     public LocalDateTime endDate;
-    public UUID id;
+    public Long id;
 
     public StonksEvent(String name, int amountOfPeople, LocalDateTime startDate, LocalDateTime endDate)  {
         this.name = name;

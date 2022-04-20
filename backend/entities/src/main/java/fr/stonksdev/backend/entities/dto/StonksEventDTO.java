@@ -1,14 +1,13 @@
 package fr.stonksdev.backend.entities.dto;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 public class StonksEventDTO {
     public String name;
     public int amountOfPeople;
     public LocalDateTime startDate;
     public LocalDateTime endDate;
-    public UUID id;
+    public Long id;
 
     public StonksEventDTO(String name, int amountOfPeople, LocalDateTime start, LocalDateTime end) {
         this.name = name;

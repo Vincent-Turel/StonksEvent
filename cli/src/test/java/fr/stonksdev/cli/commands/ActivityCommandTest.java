@@ -47,13 +47,13 @@ public class ActivityCommandTest {
         Map<String, StonksEvent> eventMap = new HashMap<>();
         LocalDateTime startDate = LocalDateTime.parse("01/01/2000 01:00", formatter);
         LocalDateTime endDate = LocalDateTime.parse("02/02/2002 22:22", formatter);
-        var event = new StonksEvent("Test", 1, startDate, endDate);
-        var id = UUID.randomUUID();
+        StonksEvent event = new StonksEvent("Test", 1, startDate, endDate);
+        long id = 1L;
         event.id = id;
         eventMap.put("Test", event);
         when(cliContext.getEvents()).thenReturn(eventMap);
 
-        var activity = new Activity(startDate, Duration.ofMinutes(1), "activity", 10);
+        Activity activity = new Activity(startDate, Duration.ofMinutes(1), "activity", 10);
 
         String json = mapper.writeValueAsString(activity);
 
@@ -72,15 +72,15 @@ public class ActivityCommandTest {
         Map<String, StonksEvent> eventMap = new HashMap<>();
         LocalDateTime startDate = LocalDateTime.parse("01/01/2000 01:00", formatter);
         LocalDateTime endDate = LocalDateTime.parse("02/02/2002 22:22", formatter);
-        var event = new StonksEvent("Test", 1, startDate, endDate);
-        var eventId = UUID.randomUUID();
+        StonksEvent event = new StonksEvent("Test", 1, startDate, endDate);
+        long eventId = 1L;
         event.id = eventId;
         eventMap.put("Test", event);
         when(cliContext.getEvents()).thenReturn(eventMap);
 
         Map<String, Activity> activityMap = new HashMap<>();
-        var activity = new Activity(startDate, Duration.ofMinutes(1), "activity", 10);
-        var activityId = UUID.randomUUID();
+        Activity activity = new Activity(startDate, Duration.ofMinutes(1), "activity", 10);
+        long activityId = 1L;
         activity.id = activityId;
         activityMap.put("activity", activity);
         when(cliContext.getActivities()).thenReturn(activityMap);
@@ -101,8 +101,8 @@ public class ActivityCommandTest {
         Map<String, StonksEvent> eventMap = new HashMap<>();
         LocalDateTime startDate = LocalDateTime.parse("01/01/2000 01:00", formatter);
         LocalDateTime endDate = LocalDateTime.parse("02/02/2002 22:22", formatter);
-        var event = new StonksEvent("Test", 1, startDate, endDate);
-        var id = UUID.randomUUID();
+        StonksEvent event = new StonksEvent("Test", 1, startDate, endDate);
+        long id = 1L;
         event.id = id;
         eventMap.put("Test", event);
         when(cliContext.getEvents()).thenReturn(eventMap);

@@ -8,15 +8,13 @@ import java.util.UUID;
 public class ActivtyDTO {
     private String name;
     private int maxPeopleAmount;
-    private String description;
     private LocalDateTime beginning;
     private Duration duration;
-    private UUID id;
+    private Long id;
 
-    public ActivtyDTO(String name, int maxPeopleAmount, String description, LocalDateTime beginning, Duration duration) {
+    public ActivtyDTO(String name, int maxPeopleAmount, LocalDateTime beginning, Duration duration) {
         this.name = name;
         this.maxPeopleAmount = maxPeopleAmount;
-        this.description = description;
         this.beginning = beginning;
         this.duration = duration;
     }
@@ -24,11 +22,11 @@ public class ActivtyDTO {
     private ActivtyDTO() {
     }
 
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -46,14 +44,6 @@ public class ActivtyDTO {
 
     public void setMaxPeopleAmount(int maxPeopleAmount) {
         this.maxPeopleAmount = maxPeopleAmount;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public LocalDateTime getBeginning() {
@@ -77,7 +67,6 @@ public class ActivtyDTO {
         return "ActivtyDTO{" +
                 "name='" + name + '\'' +
                 ", maxPeopleAmount=" + maxPeopleAmount +
-                ", description='" + description + '\'' +
                 ", beginning=" + beginning +
                 ", duration=" + duration +
                 '}';

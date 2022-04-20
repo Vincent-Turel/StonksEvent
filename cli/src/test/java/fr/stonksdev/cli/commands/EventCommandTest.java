@@ -45,7 +45,7 @@ public class EventCommandTest {
     public void createEventTest() throws JsonProcessingException {
         LocalDateTime startDate = LocalDateTime.parse("01/01/2000 01:00", formatter);
         LocalDateTime endDate = LocalDateTime.parse("02/02/2002 22:22", formatter);
-        var event = new StonksEvent("Test", 1, startDate, endDate);
+        StonksEvent event = new StonksEvent("Test", 1, startDate, endDate);
 
         String json = mapper.writeValueAsString(event);
 
@@ -64,8 +64,8 @@ public class EventCommandTest {
         Map<String, StonksEvent> eventMap = new HashMap<>();
         LocalDateTime startDate = LocalDateTime.parse("01/01/2000 01:00", formatter);
         LocalDateTime endDate = LocalDateTime.parse("02/02/2002 22:22", formatter);
-        var event = new StonksEvent("Test", 1, startDate, endDate);
-        var eventId = UUID.randomUUID();
+        StonksEvent event = new StonksEvent("Test", 1, startDate, endDate);
+        long eventId = 1L;
         event.id = eventId;
         eventMap.put("Test", event);
         when(cliContext.getEvents()).thenReturn(eventMap);

@@ -9,7 +9,7 @@ public class Activity {
     public Duration duration;
     public String name;
     public int maxPeopleAmount;
-    public UUID id;
+    public Long id;
 
     public Activity(LocalDateTime beginning, Duration duration, String name, int maxPeopleAmount) {
         this.beginning = beginning;

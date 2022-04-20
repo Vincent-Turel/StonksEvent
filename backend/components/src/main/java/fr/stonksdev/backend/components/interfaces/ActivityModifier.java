@@ -1,15 +1,22 @@
 package fr.stonksdev.backend.components.interfaces;
 
-import fr.stonksdev.backend.components.exceptions.ItemNotFoundException;
+import fr.stonksdev.backend.components.exceptions.ActivityNotFoundException;
+import fr.stonksdev.backend.components.exceptions.AlreadyExistingActivityException;
 import fr.stonksdev.backend.entities.Activity;
 import fr.stonksdev.backend.entities.Duration;
 import fr.stonksdev.backend.entities.StonksEvent;
+
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface ActivityModifier {
-    Activity create(StonksEvent stonksEvent, LocalDateTime beginning, Duration duration, String name, int maxPeopleAmount);
+    Activity createActivity(LocalDateTime beginning, Duration duration, String name, int maxPeopleAmount, StonksEvent stonksEvent) throws AlreadyExistingActivityException;
 
-    boolean modify(Activity activityToModify, Activity activityModified) throws ItemNotFoundException;
+    Activity createActivity(LocalDateTime beginning, Duration duration, String name, StonksEvent stonksEvent) throws AlreadyExistingActivityException;
 
-    boolean delete(Activity activityToDelete) throws ItemNotFoundException;
+    Activity updateActivity(Long activityId, int maxPeopleAmount, LocalDateTime startDate, Duration duration) throws ActivityNotFoundException;
+
+    void deleteActivity(Activity activity);
+
+    List<Activity> getAllActivities();
 }
