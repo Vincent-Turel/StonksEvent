@@ -1,13 +1,16 @@
-FROM mono:6.12
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build-env
+WORKDIR /app
 
-LABEL org.opencontainers.image.authors="StonksDev surname.name@univ-cotedazur.fr"
+# Copy everything
+COPY . ./
+# Restore as distinct layers
+RUN dotnet restore
+# Build and publish a release
+RUN dotnet publish -c Release -o out
 
-# Loading the executable server inside the image
-COPY ./MailService/bin/Debug/net6.0/MailService.dll ./MailService.dll
-
-# exposing the 9090 port to support external connections
+# Build runtime image
+FROM mcr.microsoft.com/dotnet/sdk:6.0
+WORKDIR /app
+COPY --from=build-env /app/out .
 EXPOSE 9090
-
-# Running the .Net server as standalone
-ENTRYPOINT ["mono", "./MailService.dll"]
-CMD ["/standalone"]
+ENTRYPOINT ["dotnet", "MailService.dll"]

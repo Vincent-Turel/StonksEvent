@@ -21,7 +21,7 @@ namespace BasicServerHTTPlistener
         public static void Main(string[] args)
         {
             Server server = new Server();
-            server.Start("http://localhost:9090/");
+            server.Start("http://*:9090/");
         }
 
     }

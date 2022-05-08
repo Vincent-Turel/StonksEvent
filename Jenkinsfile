@@ -28,10 +28,10 @@ pipeline {
         stage('Testing unstable') {
             when {
                 anyOf {
-                    changeset "components/**"
-                    changeset "controllers/**"
-                    changeset "entities/**"
-                    changeset "event-app/**"
+                    changeset "backend/components/**"
+                    changeset "backend/controllers/**"
+                    changeset "backend/entities/**"
+                    changeset "backend/event-app/**"
                 }
                 not {
                    anyOf {
@@ -41,7 +41,7 @@ pipeline {
                 }
             }
             steps {
-                sh "mvn clean test"
+                sh "cd backend && mvn clean test && cd .."
             }
         }
         stage('Build entities - dev') {
@@ -124,10 +124,21 @@ pipeline {
             }
             steps {
                 sh '''
-                docker stop cli
-                docker stop server
-                chmod u+x launch_everything.sh
-                ./launch_everything.sh
+                make stop ; make launch
+                '''
+            }
+        }
+
+        stage('Publish on Docker') {
+            when {
+                anyOf {
+                    branch "develop"
+                }
+            }
+
+            steps {
+                sh '''
+                make publish
                 '''
             }
         }

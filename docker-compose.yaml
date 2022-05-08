@@ -2,31 +2,52 @@ version: "3"
 
 services:
   # StonksEvent backend in SpringBoot
-  backend-server:
-    image: stonksevent/spring-backend
-    container_name: server
-    #environment:
-    #  - MAIL_WITH_PORT=mail-system:9090
-    #entrypoint: "bash -c '/wait-for-it.sh $${MAIL_WITH_PORT} -- java -jar /app.jar --mail.host.baseurl=http://$${MAIL_WITH_PORT}'"
-    entrypoint: "java -jar /app.jar"
-    #depends_on:
-    #  - mail-system
-
+  backend:
+    image: scrabsha/spring-backend
+    container_name: backend
+    environment:
+      - MAIL_WITH_PORT=mail:9090
+      - POSTGRES_HOST=postgres:5432
+    entrypoint: "bash -c '/wait-for-it.sh $${POSTGRES_HOST} -- java -jar /app.jar'"
+    #entrypoint: "bash -c '/wait-for-it.sh $${MAIL_WITH_PORT} $${POSTGRES_HOST} -- java -jar /app.jar'"
+    #entrypoint: "java -jar /app.jar"
+    depends_on:
+      - postgres
+      - mail
   # A simple java CLI
   cli:
-    image: stonksevent/spring-cli
+    image: scrabsha/spring-cli
     container_name: cli
     environment:
-      - SERVER_WITH_PORT=backend-server:8080
+      - SERVER_WITH_PORT=backend:8080
     entrypoint: "bash -c '/wait-for-it.sh $${SERVER_WITH_PORT} -- java -jar /app.jar'"
     depends_on:
-      - backend-server
+      - backend
     # volumes:
       # - ./cli/demo.txt:/demo.txt
     stdin_open: true
     tty: true
 
   # An external mail service in C#
-  #mail-system:
-  #  image: stonksevent/mail-service
-  #  container_name: mail
+  mail:
+    image: scrabsha/mail-service
+    container_name: mail
+    ports:
+      - "9090:9090"
+
+  # An external mail service in C#
+  postgres:
+    #image: bitnami/postgresql
+    image: postgres:14.2
+    container_name: postgres
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - POSTGRES_USER=sa
+      - POSTGRES_PASSWORD=sa
+      - POSTGRES_DB=stonks-dtb
+    volumes:
+      - stonks-dtb-volume:/var/lib/postgresql/data
+volumes:
+  stonks-dtb-volume:
+    external: false
+  

@@ -13,4 +13,3 @@ This project is composed of the following members:
 
 ## The StonksEvent Project
 Work in progress ! (./wait_for_it)
-Check if smee is working again and again and again AND AGAIN

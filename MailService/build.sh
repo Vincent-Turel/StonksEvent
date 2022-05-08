@@ -1,6 +1,4 @@
 #!/bin/bash
 
-#Preparing environment
-./compile.sh
+pushd MailService && docker build -t stonksevent/mail-service . && popd
 
-docker build -t stonksevent/mail-service .

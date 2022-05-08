@@ -6,12 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 
 import javax.sql.DataSource;
 
+@Configuration
+@PropertySource("classpath:persistence.properties")
 public class PersistenceJpaConfig {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PersistenceJpaConfig.class);
+    /*private static final Logger LOG = LoggerFactory.getLogger(PersistenceJpaConfig.class);
 
     @Autowired
     private Environment env;
@@ -25,5 +29,5 @@ public class PersistenceJpaConfig {
         dataSource.setPassword(env.getProperty("jdbc.pass"));
         LOG.info("TCFS:H2 Data-source initialized at url " + dataSource.getUrl());
         return dataSource;
-    }
+    }*/ 
 }
