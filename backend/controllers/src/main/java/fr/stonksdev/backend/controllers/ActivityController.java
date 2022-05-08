@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
@@ -26,22 +28,32 @@ public class ActivityController {
     @Autowired
     private Finder finder;
 
+    @ExceptionHandler({ActivityNotFoundException.class})
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorDTO handleExceptions(EventNotFoundException e) {
+        ErrorDTO errorDTO = new ErrorDTO();
+        errorDTO.setError("The activity does not exist");
+        errorDTO.setDetails(e.getName() + " is not a existing Id for an activity");
+        return errorDTO;
+    }
+
     @ExceptionHandler({AlreadyExistingActivityException.class})
-    public ResponseEntity<ErrorDTO> handleExceptions(AlreadyExistingActivityException e) {
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorDTO handleExceptions(AlreadyExistingActivityException e) {
         ErrorDTO errorDTO = new ErrorDTO();
         errorDTO.setError("The activity already exist");
         errorDTO.setDetails(e.getName() + " is already existing !");
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorDTO);
+        return errorDTO;
     }
 
     @PostMapping(path = ACTIVITY_URI, consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<ActivtyDTO> registerActivity(@PathVariable("eventId") Long eventId, @RequestBody ActivtyDTO activtyDTO) throws EventNotFoundException, AlreadyExistingActivityException {
+    public ResponseEntity<ActivtyDTO> registerActivity(@PathVariable("eventId") Long eventId, @RequestBody @Valid ActivtyDTO activtyDTO) throws EventNotFoundException, AlreadyExistingActivityException {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(convertActivityToDto(activityManager.createActivity(activtyDTO.getBeginning(), activtyDTO.getDuration(), activtyDTO.getName(), activtyDTO.getMaxPeopleAmount(), finder.retrieveEvent(eventId))));
     }
 
     @PostMapping(path = ACTIVITY_URI + "/{activityId}", consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<ActivtyDTO> updateActivity(@PathVariable("activityId") Long activityId, @RequestBody ActivtyDTO activtyDTO) throws ActivityNotFoundException {
+    public ResponseEntity<ActivtyDTO> updateActivity(@PathVariable("activityId") Long activityId, @RequestBody @Valid ActivtyDTO activtyDTO) throws ActivityNotFoundException {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(convertActivityToDto(activityManager.updateActivity(activityId, activtyDTO.getMaxPeopleAmount(), activtyDTO.getBeginning(), activtyDTO.getDuration())));
     }

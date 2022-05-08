@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -34,30 +35,32 @@ public class StonksEventController {
     private Finder finder;
 
     @ExceptionHandler({EventNotFoundException.class})
-    public ResponseEntity<ErrorDTO> handleExceptions(EventNotFoundException e) {
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorDTO handleExceptions(EventNotFoundException e) {
         ErrorDTO errorDTO = new ErrorDTO();
         errorDTO.setError("The event does not exist");
         errorDTO.setDetails(e.getName() + " is not a existing Id for an event");
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorDTO);
+        return errorDTO;
     }
 
     @ExceptionHandler({AlreadyExistingEventException.class})
-    public ResponseEntity<ErrorDTO> handleExceptions(AlreadyExistingEventException e) {
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorDTO handleExceptions(AlreadyExistingEventException e) {
         ErrorDTO errorDTO = new ErrorDTO();
         errorDTO.setError("The event already exist");
         errorDTO.setDetails(e.getName() + " is already existing !");
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorDTO);
+        return errorDTO;
     }
 
     @PostMapping(path = EVENTS_URI, consumes = APPLICATION_JSON_VALUE) // path is a REST CONTROLLER NAME
-    public ResponseEntity<StonksEventDTO> registerEvent(@RequestBody StonksEventDTO eventDTO) throws AlreadyExistingEventException {
+    public ResponseEntity<StonksEventDTO> registerEvent(@RequestBody @Valid StonksEventDTO eventDTO) throws AlreadyExistingEventException {
         StonksEventDTO test = convertEventToDto(eventManager.createEvent(eventDTO.name, eventDTO.amountOfPeople, eventDTO.startDate, eventDTO.endDate));
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(test);
     }
 
     @PostMapping(path = EVENT_URI, consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<StonksEventDTO> updateEvent(@PathVariable("eventId") Long eventId, @RequestBody StonksEventDTO eventDTO) throws EventNotFoundException {
+    public ResponseEntity<StonksEventDTO> updateEvent(@PathVariable("eventId") Long eventId, @RequestBody @Valid StonksEventDTO eventDTO) throws EventNotFoundException {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(convertEventToDto(eventManager.updateEvent(eventId, eventDTO.amountOfPeople, eventDTO.startDate, eventDTO.endDate)));
     }
