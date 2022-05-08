@@ -2,6 +2,7 @@ package fr.stonksdev.backend.components;
 
 import fr.stonksdev.backend.components.exceptions.RoomNotFoundException;
 import fr.stonksdev.backend.components.interfaces.RoomExplorer;
+import fr.stonksdev.backend.components.repositories.PlanningRepository;
 import fr.stonksdev.backend.components.repositories.RoomRepository;
 import fr.stonksdev.backend.entities.Activity;
 import fr.stonksdev.backend.entities.Duration;
@@ -18,6 +19,9 @@ public class RoomPlanning implements RoomExplorer {
 
     @Autowired
     private RoomRepository roomRepo;
+
+    @Autowired
+    PlanningRepository planningRepo;
 
     @Override
     public Room searchFreeRoom(RoomKind roomKind, LocalDateTime beginning, Duration duration, int minCapacity) throws RoomNotFoundException {

@@ -39,6 +39,7 @@ public class Activity {
         this.name = name;
         this.maxPeopleAmount = maxPeopleAmount;
         this.event = event;
+        this.room = null;
     }
 
     public Activity(LocalDateTime beginning, Duration duration, String name, StonksEvent event) {
@@ -47,6 +48,7 @@ public class Activity {
         this.name = name;
         this.maxPeopleAmount = 9999;
         this.event = event;
+        this.room = null;
     }
 
     public Activity() {
@@ -110,7 +112,7 @@ public class Activity {
     }
 
     public TimeSlot generateTimeSlot() {
-        return new TimeSlot(name, beginning, duration);
+        return new TimeSlot(this, beginning, duration);
     }
 
     @Override

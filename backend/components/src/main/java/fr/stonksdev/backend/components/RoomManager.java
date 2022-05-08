@@ -4,6 +4,7 @@ import fr.stonksdev.backend.components.exceptions.*;
 import fr.stonksdev.backend.components.interfaces.RoomBooking;
 import fr.stonksdev.backend.components.interfaces.RoomFinder;
 import fr.stonksdev.backend.components.interfaces.RoomModifier;
+import fr.stonksdev.backend.components.repositories.PlanningRepository;
 import fr.stonksdev.backend.components.repositories.RoomRepository;
 import fr.stonksdev.backend.entities.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,9 @@ public class RoomManager implements RoomBooking, RoomModifier, RoomFinder {
     @Autowired
     private RoomRepository roomRepo;
 
+    @Autowired
+    private PlanningRepository planningRepo;
+
     @Override
     public boolean bookRoom(Room room, Activity activity) throws RoomAlreadyBookedException {
         Set<Activity> activities = room.getActivities();
@@ -31,11 +35,12 @@ public class RoomManager implements RoomBooking, RoomModifier, RoomFinder {
                 return false;
         }
         room.addActivity(activity);
-        return true;    
+        return true;
     }
 
     @Override
     public boolean freeRoom(Room room, Activity activity) {
+        activity.setRoom(null);
         return room.getActivities().remove(activity);
     }
 
@@ -43,8 +48,12 @@ public class RoomManager implements RoomBooking, RoomModifier, RoomFinder {
     @Transactional
     public Room create(String name, RoomKind roomKind, int capacity) throws AlreadyExistingRoomException {
         Room newRoom = new Room(name, roomKind, capacity);
-        roomRepo.save(newRoom);
-        return newRoom;
+        if (!roomRepo.existsByName(name)) {
+            roomRepo.save(newRoom);
+            return newRoom;
+        } else {
+            throw new AlreadyExistingRoomException();
+        }
     }
 
     @Override
@@ -67,66 +76,53 @@ public class RoomManager implements RoomBooking, RoomModifier, RoomFinder {
         roomRepo.delete(room);
     }
 
-    @Override
-    public List<TimeSlot> getPlanningOf(StonksEvent event, Room room) throws RoomNotFoundException {
-        fillPlanningTable(event);
-
-        List<Activity> roomActivities = new ArrayList<>(room.getActivities());
-
-        List<Activity> activities = new ArrayList<>(roomActivities.size());
-
-        for (Activity activity : roomActivities) {
-            if (Objects.isNull(activity) || activity.getEvent().equals(event)) {
-                continue;
-            }
-
-            activities.add(activity);
+    public void updatePlanning(StonksEvent event) throws RoomNotFoundException {
+        Optional<Planning> planningOpt = planningRepo.findPlanningByEvent(event);
+        Planning planning;
+        if (planningOpt.isEmpty()) {
+            planning = new Planning(event);
+        } else {
+            planning = planningOpt.get();
+            planning.clearSlots();
         }
-
-        activities.sort(Comparator.comparing(Activity::getBeginning));
-
-        return activities.stream().map(activity -> new TimeSlot(activity.getName(), activity.getBeginning(), activity.getDuration())).collect(Collectors.toList());
+        fillPlanningTable(event);
+        event.getActivities().forEach(a -> planning.addSlot(a.generateTimeSlot()));
+        planningRepo.save(planning);
     }
 
-    public Map<String, List<TimeSlot>> getPlanningOf(StonksEvent event) throws RoomNotFoundException {
-        fillPlanningTable(event);
+    @Override
+    public Planning getPlanningOf(StonksEvent event, Room room) throws RoomNotFoundException {
+        updatePlanning(event);
 
-        Map<String, List<TimeSlot>> assoc = new HashMap<>();
+        Planning planning = planningRepo.getByEvent(event);
 
-        for (Room room : roomRepo.findAll()) {
-            List<TimeSlot> activities = new ArrayList<>();
+        return planning.getPlanningForRoom(room);
+    }
 
-            for (Activity activity : room.getActivities()) {
-                TimeSlot timeSlot = activity.generateTimeSlot();
-                activities.add(timeSlot);
-            }
+    @Transactional
+    public Planning getPlanningOf(StonksEvent event) throws RoomNotFoundException {
+        updatePlanning(event);
 
-            assoc.put(room.getName(), activities);
-        }
-
-        return assoc;
+        return planningRepo.getByEvent(event);
     }
 
     private void fillPlanningTable(StonksEvent event) throws RoomNotFoundException {
         Set<Activity> activities = event.getActivities();
         for (Activity activity : activities) {
-            if (!aRoomIsBookedFor(activity)) {
+            if (activity.getRoom() == null) {
                 bookRoomFor(activity);
             }
         }
     }
 
-    private boolean aRoomIsBookedFor(Activity activity) {
-        return roomRepo.findAll()
-                .stream()
-                .anyMatch(room -> room.getActivities().contains(activity));
-    }
-
-    private void bookRoomFor(Activity activity) throws RoomNotFoundException {
+    @Transactional
+    void bookRoomFor(Activity activity) throws RoomNotFoundException {
         // TODO add complexity (don't just get first room)
         Room room = roomRepo.findAll().stream().findFirst().orElseThrow(RoomNotFoundException::new);
 
         room.addActivity(activity);
+        activity.setRoom(room);
+        roomRepo.save(room);
     }
 
     @Override
