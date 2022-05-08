@@ -126,12 +126,12 @@
         <repository>
             <id>central</id>
             <name>5b4c3e84e809-releases</name>
-            <url>http://vmpx08.polytech.unice.fr:8016/artifactory/teamh/</url>
+            <url>http://vmpx08.polytech.unice.fr:8017/artifactory/teamh-repository/</url>
         </repository>
         <snapshotRepository>
             <id>snapshots</id>
             <name>5b4c3e84e809-snapshots</name>
-            <url>http://vmpx08.polytech.unice.fr:8016/artifactory/teamh/</url>
+            <url>http://vmpx08.polytech.unice.fr:8017/artifactory/teamh-repository/</url>
         </snapshotRepository>
     </distributionManagement>
     <profiles>
@@ -141,7 +141,7 @@
                 <repository>
                     <id>snapshots</id>
                     <name>local-artifactory</name>
-                    <url>http://vmpx08.polytech.unice.fr:8016/artifactory/teamh/</url>
+                    <url>http://vmpx08.polytech.unice.fr:8017/artifactory/teamh-repository/</url>
                 </repository>
             </repositories>
         </profile>
