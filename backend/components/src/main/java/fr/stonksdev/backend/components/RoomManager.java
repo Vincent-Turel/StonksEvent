@@ -81,13 +81,10 @@ public class RoomManager implements RoomBooking, RoomModifier, RoomFinder {
         Planning planning;
         if (planningOpt.isEmpty()) {
             planning = new Planning(event);
-        } else {
-            planning = planningOpt.get();
-            planning.clearSlots();
+            fillPlanningTable(event);
+            event.getActivities().forEach(a -> planning.addSlot(a.generateTimeSlot()));
+            planningRepo.save(planning);
         }
-        fillPlanningTable(event);
-        event.getActivities().forEach(a -> planning.addSlot(a.generateTimeSlot()));
-        planningRepo.save(planning);
     }
 
     @Override
@@ -102,8 +99,8 @@ public class RoomManager implements RoomBooking, RoomModifier, RoomFinder {
     @Transactional
     public Planning getPlanningOf(StonksEvent event) throws RoomNotFoundException {
         updatePlanning(event);
-
-        return planningRepo.getByEvent(event);
+        var planning = planningRepo.getByEvent(event);
+        return planning;
     }
 
     private void fillPlanningTable(StonksEvent event) throws RoomNotFoundException {

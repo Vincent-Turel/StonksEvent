@@ -7,7 +7,7 @@ import java.util.Comparator;
 import java.util.List;
 
 @Entity
-public class Planning{
+public class Planning {
 
     @Id
     @GeneratedValue

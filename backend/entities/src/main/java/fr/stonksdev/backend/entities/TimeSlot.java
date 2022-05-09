@@ -6,12 +6,12 @@ import java.time.LocalDateTime;
 /**
  * Represents a slot at which a specific activity is scheduled in a given room.
  * This is mostly useful for planning generation.<br>
- *
+ * <p>
  * This class is a DTO. This means that is has no behaviour, every field is
  * public and will stay like this.
  */
 @Entity
-public class TimeSlot {
+public class TimeSlot implements Comparable<TimeSlot> {
 
     @Id
     @GeneratedValue
@@ -33,6 +33,10 @@ public class TimeSlot {
         this.duration = duration;
     }
 
+    public LocalDateTime end() {
+        return beginning.plusMinutes(duration.asMinutes());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -51,6 +55,11 @@ public class TimeSlot {
         result = 31 * result + beginning.hashCode();
         result = 31 * result + duration.hashCode();
         return result;
+    }
+
+    @Override
+    public int compareTo(TimeSlot timeSlot) {
+        return beginning.compareTo(timeSlot.beginning);
     }
 
     public Activity getActivity() {
