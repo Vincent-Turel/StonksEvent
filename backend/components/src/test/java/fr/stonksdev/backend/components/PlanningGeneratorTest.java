@@ -91,6 +91,14 @@ public class PlanningGeneratorTest {
     }
 
     @Test
+    void getPlanningTwiceReturnsSame() throws Exception {
+        Planning planning = roomManager.getPlanningOf(event1);
+        Planning planning2 = roomManager.getPlanningOf(event1);
+        assertEquals(planning.getSize(), planning2.getSize());
+        assertEquals(planning.getTimeSlots().get(0).getActivity(), planning2.getTimeSlots().get(0).getActivity());
+    }
+
+    @Test
     void eventWithNoActivityHasNoPlanning() throws Exception {
         Planning planning = roomManager.getPlanningOf(event2);
         long amountOfActivities = planning.getSize();

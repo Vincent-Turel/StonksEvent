@@ -48,12 +48,9 @@ public class TaskTimeBound {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
+        if (!(o instanceof TaskTimeBound)) return false;
         TaskTimeBound that = (TaskTimeBound) o;
-
-        if (!Objects.equals(before, that.before)) return false;
-        return Objects.equals(after, that.after);
+        return Objects.equals(before, that.before) && Objects.equals(after, that.after);
     }
 
     @Override

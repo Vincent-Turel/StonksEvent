@@ -1,4 +1,4 @@
-package fr.stonksdev.cli.model;a
+package fr.stonksdev.cli.model;
 
 import java.time.LocalDateTime;
 

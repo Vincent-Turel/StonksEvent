@@ -3,18 +3,17 @@ package fr.stonksdev.backend.controllers;
 import fr.stonksdev.backend.components.StonksEventManager;
 import fr.stonksdev.backend.components.exceptions.AlreadyExistingEventException;
 import fr.stonksdev.backend.components.exceptions.EventNotFoundException;
-import fr.stonksdev.backend.components.interfaces.StonksEventFinder;
-import fr.stonksdev.backend.entities.dto.ErrorDTO;
-import fr.stonksdev.backend.entities.dto.StonksEventDTO;
 import fr.stonksdev.backend.entities.Activity;
 import fr.stonksdev.backend.entities.StonksEvent;
+import fr.stonksdev.backend.entities.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -65,14 +64,53 @@ public class StonksEventController {
                 .body(convertEventToDto(eventManager.updateEvent(eventId, eventDTO.amountOfPeople, eventDTO.startDate, eventDTO.endDate)));
     }
 
+    @GetMapping(ACTIVITY_URI)
+    public ResponseEntity<ActivityWrapperDTO> getAllActivitiesFromEvent(@PathVariable("eventId") Long eventId) throws EventNotFoundException {
+        return ResponseEntity.ok(
+                new ActivityWrapperDTO(
+                        convertSetActivityToDto(
+                                eventManager.getAllActivitiesFromEvent(finder.retrieveEvent(eventId))
+                        )
+                )
+        );
+    }
+
+    @GetMapping(EVENTS_URI)
+    public ResponseEntity<StonksEventWrapperDTO> getAllEvents() {
+        return ResponseEntity.ok(
+                new StonksEventWrapperDTO(
+                        convertSetStonksEventToDto(
+                                eventManager.getAllEvent()
+                        )
+                )
+        );
+    }
+
     private StonksEventDTO convertEventToDto(StonksEvent event) {
         StonksEventDTO eventDTO = new StonksEventDTO(event.getName(), event.getAmountOfPeople(), event.getStartDate(), event.getEndDate());
         eventDTO.id = event.getId();
         return eventDTO;
     }
 
-    @GetMapping(ACTIVITY_URI)
-    public ResponseEntity<Set<Activity>> getAllActivitiesFromEvent(@PathVariable("eventId") Long eventId) throws EventNotFoundException {
-        return ResponseEntity.ok(new HashSet<>(eventManager.getAllActivitiesFromEvent(finder.retrieveEvent(eventId))));
+    private ActivityDTO convertActivityToDto(Activity activity) {
+        ActivityDTO activityDTO = new ActivityDTO(activity.getName(), activity.getMaxPeopleAmount(), activity.getBeginning(), activity.getDuration());
+        activityDTO.id = activity.getId();
+        return activityDTO;
+    }
+
+    private List<ActivityDTO> convertSetActivityToDto(Set<Activity> set) {
+        List<ActivityDTO> activityDTOSet = new ArrayList<>();
+        for (Activity activity : set) {
+            activityDTOSet.add(convertActivityToDto(activity));
+        }
+        return activityDTOSet;
+    }
+
+    private List<StonksEventDTO> convertSetStonksEventToDto(List<StonksEvent> set) {
+        List<StonksEventDTO> stonksEventDTOS = new ArrayList<>();
+        for (StonksEvent stonksEvent : set) {
+            stonksEventDTOS.add(convertEventToDto(stonksEvent));
+        }
+        return stonksEventDTOS;
     }
 }

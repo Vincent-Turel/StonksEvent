@@ -27,8 +27,12 @@ public class TaskManager implements TaskGenerator {
     public List<Task> tasksForEvent(StonksEvent event) throws RoomNotFoundException, ActivityNotFoundException {
         // In the future, we should add more tasks here.
         var tasks = getCleaningTasks(event);
-        taskRepo.deleteAll();
-        return taskRepo.saveAll(tasks);
+        List<Task> res = new ArrayList<>();
+        tasks.forEach(t -> {
+            var x = taskRepo.findAll().stream().filter(t2 -> t2.getRoom().equals(t.getRoom()) && t2.getTimeBound().equals(t.getTimeBound())).findAny();
+            res.add(x.isEmpty() ? taskRepo.save(t): x.get());
+        });
+        return res;
     }
 
     List<Task> getCleaningTasks(StonksEvent event) throws RoomNotFoundException, ActivityNotFoundException {

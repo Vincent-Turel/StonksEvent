@@ -54,7 +54,7 @@ public class RoomManager implements RoomBooking, RoomModifier, RoomFinder {
             roomRepo.save(newRoom);
             return newRoom;
         } else {
-            throw new AlreadyExistingRoomException();
+            throw new AlreadyExistingRoomException(name);
         }
     }
 
@@ -78,6 +78,7 @@ public class RoomManager implements RoomBooking, RoomModifier, RoomFinder {
         roomRepo.delete(room);
     }
 
+    @Transactional
     public void updatePlanning(StonksEvent event) throws RoomNotFoundException {
         Optional<Planning> planningOpt = planningRepo.findPlanningByEvent(event);
         Planning planning;

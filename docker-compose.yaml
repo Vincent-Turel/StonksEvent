@@ -14,6 +14,8 @@ services:
     depends_on:
       - postgres
       - mail
+    ports:
+      - 8080:8080
   # A simple java CLI
   cli:
     image: scrabsha/spring-cli

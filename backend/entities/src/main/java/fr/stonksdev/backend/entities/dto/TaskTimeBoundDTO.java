@@ -14,4 +14,8 @@ public class TaskTimeBoundDTO {
         this.before = timeBound.Before().orElse(null);
         this.after = timeBound.After().orElse(null);
     }
+
+    public TaskTimeBoundDTO() {
+
+    }
 }

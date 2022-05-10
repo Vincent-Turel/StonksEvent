@@ -16,8 +16,13 @@ public class RoomDTO {
     public int capacity;
 
     public RoomDTO(Room room) {
+        this.id = room.getId();
         this.name = room.getName();
         this.roomKind = room.getRoomKind();
         this.capacity = room.getCapacity();
+    }
+
+    public RoomDTO() {
+
     }
 }

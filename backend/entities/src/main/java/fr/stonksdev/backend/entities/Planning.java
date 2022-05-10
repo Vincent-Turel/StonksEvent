@@ -17,7 +17,7 @@ public class Planning {
     @OneToOne
     private StonksEvent event;
 
-    @OneToMany(mappedBy = "planning", cascade = CascadeType.PERSIST)
+    @OneToMany(cascade = CascadeType.PERSIST)
     private List<TimeSlot> timeSlots;
 
     public Planning(StonksEvent event) {
@@ -47,6 +47,14 @@ public class Planning {
 
     public List<TimeSlot> getTimeSlots() {
         return timeSlots;
+    }
+
+    public StonksEvent getEvent() {
+        return event;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public Planning getPlanningForRoom(Room room) {

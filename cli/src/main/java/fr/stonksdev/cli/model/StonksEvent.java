@@ -24,13 +24,12 @@ public class StonksEvent {
 
     @Override
     public String toString() {
-        return "StonksEvent{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", amountOfPeople=" + amountOfPeople +
-                ", startDate=" + startDate +
-                ", endDate=" + endDate +
-                '}';
+        return "StonksEvent : " +
+                "id = " + id +
+                ", name = \"" + name + '\"' +
+                ", amountOfPeople = " + amountOfPeople +
+                ", startDate = " + startDate +
+                ", endDate = " + endDate;
     }
 
     @Override

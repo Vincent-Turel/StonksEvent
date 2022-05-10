@@ -1,7 +1,9 @@
 package fr.stonksdev.cli.commands;
 
 import fr.stonksdev.cli.CliContext;
+import fr.stonksdev.cli.model.Activity;
 import fr.stonksdev.cli.model.StonksEvent;
+import fr.stonksdev.cli.model.StonksEventWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
@@ -10,12 +12,12 @@ import org.springframework.web.client.RestTemplate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.UUID;
+import java.util.Map;
 
 @ShellComponent
 public class EventCommand {
 
-    private static final String BASE_URI = "/events";
+    public static final String EVENT_BASE_URI = "/events";
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
@@ -31,7 +33,7 @@ public class EventCommand {
         LocalDateTime startDate = LocalDateTime.parse(start, formatter);
         LocalDateTime endDate = LocalDateTime.parse(end, formatter);
 
-        StonksEvent event = restTemplate.postForObject(BASE_URI, new StonksEvent(name, poepleNb, startDate, endDate), StonksEvent.class);
+        StonksEvent event = restTemplate.postForObject(EVENT_BASE_URI, new StonksEvent(name, poepleNb, startDate, endDate), StonksEvent.class);
         cliContext.getEvents().put(name, event);
         return event;
     }
@@ -44,14 +46,21 @@ public class EventCommand {
             throw new Exception("The event '" + name + "' does not exist, please, use this command for only an existing event.");
         }
         Long eventId = cliContext.getEvents().get(name).id;
-        StonksEvent event = restTemplate.postForObject(BASE_URI + "/" + eventId, new StonksEvent(name, poepleNb, startDate, endDate), StonksEvent.class);
+        StonksEvent event = restTemplate.postForObject(EVENT_BASE_URI + "/" + eventId, new StonksEvent(name, poepleNb, startDate, endDate), StonksEvent.class);
         cliContext.getEvents().put(name, event);
         return event;
     }
 
     @ShellMethod("List all events")
     public String events() {
-        return cliContext.getEvents().toString();
+        Map<String, StonksEvent> stonksEventMap = cliContext.getEvents();
+        StringBuilder res = new StringBuilder();
+        res.append("All events :\n");
+        int i = 1;
+        for (StonksEvent event: stonksEventMap.values()) {
+            res.append(i).append(". ").append(event.toString()).append("\n");
+            i++;
+        }
+        return res.toString();
     }
-
 }

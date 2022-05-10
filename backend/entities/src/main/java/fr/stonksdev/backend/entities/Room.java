@@ -81,7 +81,7 @@ public class Room extends Place {
         if (this == o) return true;
         if (!(o instanceof Room)) return false;
         Room room = (Room) o;
-        return getCapacity() == room.getCapacity() && Objects.equals(getName(), room.getName()) && getRoomKind() == room.getRoomKind() && Objects.equals(getActivities(), room.getActivities());
+        return getCapacity() == room.getCapacity() && getName().equals(room.getName()) && getRoomKind() == room.getRoomKind();
     }
 
     @Override

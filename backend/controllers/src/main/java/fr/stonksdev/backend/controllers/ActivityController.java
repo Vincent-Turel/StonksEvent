@@ -5,7 +5,8 @@ import fr.stonksdev.backend.components.exceptions.ActivityNotFoundException;
 import fr.stonksdev.backend.components.exceptions.AlreadyExistingActivityException;
 import fr.stonksdev.backend.components.exceptions.EventNotFoundException;
 import fr.stonksdev.backend.entities.Activity;
-import fr.stonksdev.backend.entities.dto.ActivtyDTO;
+import fr.stonksdev.backend.entities.dto.ActivityDTO;
+import fr.stonksdev.backend.entities.dto.ActivityWrapperDTO;
 import fr.stonksdev.backend.entities.dto.ErrorDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,13 +15,18 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 public class ActivityController {
     public static final String EVENTS_URI = "/events";
     public static final String EVENT_URI = EVENTS_URI + "/{eventId}";
-    public static final String ACTIVITY_URI = EVENT_URI + "/activities";
+    public static final String ACTIVITIES_URI = "/activities";
+    public static final String ACTIVITY_URI = EVENT_URI + ACTIVITIES_URI;
 
     @Autowired
     private ActivityManager activityManager;
@@ -47,20 +53,39 @@ public class ActivityController {
     }
 
     @PostMapping(path = ACTIVITY_URI, consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<ActivtyDTO> registerActivity(@PathVariable("eventId") Long eventId, @RequestBody @Valid ActivtyDTO activtyDTO) throws EventNotFoundException, AlreadyExistingActivityException {
+    public ResponseEntity<ActivityDTO> registerActivity(@PathVariable("eventId") Long eventId, @RequestBody @Valid ActivityDTO activityDTO) throws EventNotFoundException, AlreadyExistingActivityException {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(convertActivityToDto(activityManager.createActivity(activtyDTO.getBeginning(), activtyDTO.getDuration(), activtyDTO.getName(), activtyDTO.getMaxPeopleAmount(), finder.retrieveEvent(eventId))));
+                .body(convertActivityToDto(activityManager.createActivity(activityDTO.beginning, activityDTO.duration, activityDTO.name, activityDTO.maxPeopleAmount, finder.retrieveEvent(eventId))));
     }
 
     @PostMapping(path = ACTIVITY_URI + "/{activityId}", consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<ActivtyDTO> updateActivity(@PathVariable("activityId") Long activityId, @RequestBody @Valid ActivtyDTO activtyDTO) throws ActivityNotFoundException {
+    public ResponseEntity<ActivityDTO> updateActivity(@PathVariable("activityId") Long activityId, @RequestBody @Valid ActivityDTO activityDTO) throws ActivityNotFoundException {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(convertActivityToDto(activityManager.updateActivity(activityId, activtyDTO.getMaxPeopleAmount(), activtyDTO.getBeginning(), activtyDTO.getDuration())));
+                .body(convertActivityToDto(activityManager.updateActivity(activityId, activityDTO.maxPeopleAmount, activityDTO.beginning, activityDTO.duration)));
     }
 
-    private ActivtyDTO convertActivityToDto(Activity activity) {
-        ActivtyDTO activityDTO = new ActivtyDTO(activity.getName(), activity.getMaxPeopleAmount(), activity.getBeginning(), activity.getDuration());
-        activityDTO.setId(activity.getId());
+    @GetMapping(ACTIVITIES_URI)
+    public ResponseEntity<ActivityWrapperDTO> getAllActivities() {
+        return ResponseEntity.ok(
+                new ActivityWrapperDTO(
+                        convertListActivityToDto(
+                                activityManager.getAllActivities()
+                        )
+                )
+        );
+    }
+
+    private ActivityDTO convertActivityToDto(Activity activity) {
+        ActivityDTO activityDTO = new ActivityDTO(activity.getName(), activity.getMaxPeopleAmount(), activity.getBeginning(), activity.getDuration());
+        activityDTO.id = activity.getId();
         return activityDTO;
+    }
+
+    private List<ActivityDTO> convertListActivityToDto(List<Activity> list) {
+        List<ActivityDTO> activityDTOList = new ArrayList<>();
+        for (Activity activity : list) {
+            activityDTOList.add(convertActivityToDto(activity));
+        }
+        return activityDTOList;
     }
 }

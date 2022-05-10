@@ -5,10 +5,10 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class Activity {
-    public LocalDateTime beginning;
-    public Duration duration;
     public String name;
     public int maxPeopleAmount;
+    public LocalDateTime beginning;
+    public Duration duration;
     public Long id;
 
     public Activity(LocalDateTime beginning, Duration duration, String name, int maxPeopleAmount) {
@@ -24,13 +24,12 @@ public class Activity {
 
     @Override
     public String toString() {
-        return "Activity{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", maxPeopleAmount=" + maxPeopleAmount +
-                ", beginning=" + beginning +
-                ", duration=" + duration +
-                '}';
+        return "Activity : " +
+                "id = " + id +
+                ", name = \"" + name + '\"' +
+                ", maxPeopleAmount = " + maxPeopleAmount +
+                ", beginning = " + beginning +
+                ", duration = " + duration;
     }
 
     @Override

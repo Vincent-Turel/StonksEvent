@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 /**
  * Represents a slot at which a specific activity is scheduled in a given room.
  * This is mostly useful for planning generation.<br>
- * <p>
+ *
  * This class is a DTO. This means that is has no behaviour, every field is
  * public and will stay like this.
  */
@@ -21,9 +21,6 @@ public class TimeSlot implements Comparable<TimeSlot> {
     private Activity activity;
     private LocalDateTime beginning;
     private Duration duration;
-
-    @ManyToOne
-    private Planning planning;
 
     public TimeSlot() {}
 
@@ -55,6 +52,10 @@ public class TimeSlot implements Comparable<TimeSlot> {
         result = 31 * result + beginning.hashCode();
         result = 31 * result + duration.hashCode();
         return result;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     @Override

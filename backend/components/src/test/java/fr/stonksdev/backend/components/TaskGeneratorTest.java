@@ -66,6 +66,7 @@ public class TaskGeneratorTest {
 
         planning = roomManager.getPlanningOf(event);
         tasks = taskGenerator.tasksForEvent(event);
+        tasks = taskGenerator.tasksForEvent(event);
     }
 
     @Test

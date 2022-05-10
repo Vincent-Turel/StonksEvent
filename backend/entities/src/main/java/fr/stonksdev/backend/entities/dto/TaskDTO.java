@@ -18,4 +18,8 @@ public class TaskDTO {
         this.timeBound = new TaskTimeBoundDTO(task.getTimeBound());
         this.roomId = task.getRoom().getId();
     }
+
+    public TaskDTO() {
+
+    }
 }
