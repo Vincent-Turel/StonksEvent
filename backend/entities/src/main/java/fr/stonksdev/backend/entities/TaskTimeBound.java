@@ -1,19 +1,28 @@
 package fr.stonksdev.backend.entities;
 
+import javax.persistence.Basic;
+import javax.persistence.Embeddable;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
 
+@Embeddable
 public class TaskTimeBound {
     // Invariant: at least one of `before` and `after` must be non-empty.
     // This is guaranteed by the `before`, `after` and `between` methods.
 
-    public Optional<LocalDateTime> before;
-    public Optional<LocalDateTime> after;
+    private LocalDateTime before;
+
+    private LocalDateTime after;
 
     private TaskTimeBound(Optional<LocalDateTime> before, Optional<LocalDateTime> after) {
-        this.before = before;
-        this.after = after;
+        this.before = before.orElse(null);
+        this.after = after.orElse(null);
+    }
+
+    public TaskTimeBound() {
+
     }
 
     public static TaskTimeBound before(LocalDateTime before) {
@@ -26,6 +35,14 @@ public class TaskTimeBound {
 
     public static TaskTimeBound between(LocalDateTime before, LocalDateTime after) {
         return new TaskTimeBound(Optional.of(before), Optional.of(after));
+    }
+
+    public Optional<LocalDateTime> Before() {
+        return Optional.ofNullable(before);
+    }
+
+    public Optional<LocalDateTime> After() {
+        return Optional.ofNullable(after);
     }
 
     @Override
@@ -41,8 +58,8 @@ public class TaskTimeBound {
 
     @Override
     public int hashCode() {
-        int result = before.isPresent() ? before.hashCode() : 0;
-        result = 31 * result + (after.isPresent() ? after.hashCode() : 0);
+        int result = before != null ? before.hashCode() : 0;
+        result = 31 * result + (after != null ? after.hashCode() : 0);
         return result;
     }
 }

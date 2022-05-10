@@ -18,7 +18,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -68,6 +68,11 @@ public class TaskGeneratorTest {
         tasks = taskGenerator.tasksForEvent(event);
     }
 
+    @Test
+    void tasksAreCreated() {
+        assertEquals(3, tasks.size());
+    }
+
     // We can't really hardcode data in these tests, as we're not supposed to
     // know how the planning will look like. As such, we're only guessing
     // properties of the task set based on the planning structure.
@@ -76,7 +81,7 @@ public class TaskGeneratorTest {
     void cleanupAtTheBeginningIsPresent() {
         for (var roomUsed : roomsUsedForEvent()) {
             var firstActivityInTheRoom = roomUsed.getActivities().stream().min(Comparator.comparing(Activity::getBeginning)).get();
-            var initialCleaningTaskThatShouldBeCreated = Task.cleaning(roomUsed.getName(), TaskTimeBound.before(firstActivityInTheRoom.getBeginning()));
+            var initialCleaningTaskThatShouldBeCreated = Task.cleaning(roomUsed, TaskTimeBound.before(firstActivityInTheRoom.getBeginning()));
 
             assertTrue(tasks.contains(initialCleaningTaskThatShouldBeCreated));
         }
@@ -100,7 +105,7 @@ public class TaskGeneratorTest {
                 var previousTime = previousActivity.end();
                 var nextTime = nextActivity.getBeginning();
 
-                var cleaningTaskBetweenActivities = Task.cleaning(roomUsed.getName(), TaskTimeBound.between(previousTime, nextTime));
+                var cleaningTaskBetweenActivities = Task.cleaning(roomUsed, TaskTimeBound.between(previousTime, nextTime));
 
                 assertTrue(tasks.contains(cleaningTaskBetweenActivities));
             }
@@ -111,7 +116,7 @@ public class TaskGeneratorTest {
     void cleanupAtTheEndIsPresent() {
         for (var roomUsed : roomsUsedForEvent()) {
             var lastActivityInTheRoom = roomUsed.getActivities().stream().max(Comparator.comparing(Activity::getBeginning)).get();
-            var initialCleaningTaskThatShouldBeCreated = Task.cleaning(roomUsed.getName(), TaskTimeBound.after(lastActivityInTheRoom.getEndDate()));
+            var initialCleaningTaskThatShouldBeCreated = Task.cleaning(roomUsed, TaskTimeBound.after(lastActivityInTheRoom.getEndDate()));
 
             assertTrue(tasks.contains(initialCleaningTaskThatShouldBeCreated));
         }

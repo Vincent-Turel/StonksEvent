@@ -23,6 +23,8 @@ public class RoomManager implements RoomBooking, RoomModifier, RoomFinder {
     @Autowired
     private PlanningRepository planningRepo;
 
+    @Autowired RoomPlanning roomPlanning;
+
     @Override
     public boolean bookRoom(Room room, Activity activity) throws RoomAlreadyBookedException {
         Set<Activity> activities = room.getActivities();
@@ -114,8 +116,7 @@ public class RoomManager implements RoomBooking, RoomModifier, RoomFinder {
 
     @Transactional
     void bookRoomFor(Activity activity) throws RoomNotFoundException {
-        // TODO add complexity (don't just get first room)
-        Room room = roomRepo.findAll().stream().findFirst().orElseThrow(RoomNotFoundException::new);
+        Room room = roomPlanning.searchFreeRoom(activity);
 
         room.addActivity(activity);
         activity.setRoom(room);

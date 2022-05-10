@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class RoomPlanning implements RoomExplorer {
@@ -24,13 +25,13 @@ public class RoomPlanning implements RoomExplorer {
     PlanningRepository planningRepo;
 
     @Override
-    public Room searchFreeRoom(RoomKind roomKind, LocalDateTime beginning, Duration duration, int minCapacity) throws RoomNotFoundException {
-        return finder(Optional.of(roomKind), beginning, duration, minCapacity);
+    public Room searchFreeRoom(RoomKind roomKind, Activity activity) throws RoomNotFoundException {
+        return finder(Optional.of(roomKind), activity);
     }
 
     @Override
-    public Room searchFreeRoom(LocalDateTime beginning, Duration duration, int minCapacity) throws RoomNotFoundException {
-        return finder(Optional.empty(),beginning, duration, minCapacity);
+    public Room searchFreeRoom(Activity activity) throws RoomNotFoundException {
+        return finder(Optional.empty(), activity);
     }
 
     private boolean checkRoomKind(Room item, Optional<RoomKind> roomKind) {
@@ -40,19 +41,19 @@ public class RoomPlanning implements RoomExplorer {
         return item.getRoomKind().equals(roomKind.get());
     }
 
-    private Room finder(Optional<RoomKind> roomKind, LocalDateTime beginning, Duration duration, int minCapacity) throws RoomNotFoundException {
+    private Room finder(Optional<RoomKind> roomKind, Activity activity) throws RoomNotFoundException {
         Room found = null;
         int size = -1;
         for (Room room : roomRepo.findAll()) {
-            if (checkRoomKind(room, roomKind) && room.getCapacity() >= minCapacity && (size == -1 || size > room.getCapacity())) {
-                Set<Activity> activities = room.getActivities();
+            if (checkRoomKind(room, roomKind) && room.getCapacity() >= activity.getMaxPeopleAmount() && (size == -1 || size > room.getCapacity())) {
+                Set<Activity> activities = room.getActivities().stream().filter(act -> !act.equals(activity)).collect(Collectors.toSet());
                 if (activities.isEmpty()) {
                     size = room.getCapacity();
                     found = room;
                 } else {
                     boolean isFree = true;
-                    for (Activity activity : activities) {
-                        if (activity.getEndDate().isAfter(beginning)) {
+                    for (Activity act : activities) {
+                        if ((activity.getBeginning().isBefore(act.getEndDate()) && !activity.getBeginning().isBefore(act.getBeginning())) || (activity.getEndDate().isAfter(act.getBeginning()) && !activity.getEndDate().isAfter(act.getEndDate()))) {
                             isFree = false;
                         }
                     }

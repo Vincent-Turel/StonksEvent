@@ -64,6 +64,7 @@ public class Room extends Place {
     }
 
     public void addActivity(Activity activity) {
+        activity.setRoom(this);
         activities.add(activity);
     }
 

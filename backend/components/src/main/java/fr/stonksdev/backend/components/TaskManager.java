@@ -3,8 +3,11 @@ package fr.stonksdev.backend.components;
 import fr.stonksdev.backend.components.exceptions.ActivityNotFoundException;
 import fr.stonksdev.backend.components.exceptions.RoomNotFoundException;
 import fr.stonksdev.backend.components.interfaces.TaskGenerator;
+import fr.stonksdev.backend.components.repositories.TaskRepository;
 import fr.stonksdev.backend.entities.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -17,10 +20,15 @@ public class TaskManager implements TaskGenerator {
     @Autowired
     private RoomManager roomManager;
 
+    @Autowired
+    private TaskRepository taskRepo;
+
     @Override
     public List<Task> tasksForEvent(StonksEvent event) throws RoomNotFoundException, ActivityNotFoundException {
         // In the future, we should add more tasks here.
-        return getCleaningTasks(event);
+        var tasks = getCleaningTasks(event);
+        taskRepo.deleteAll();
+        return taskRepo.saveAll(tasks);
     }
 
     List<Task> getCleaningTasks(StonksEvent event) throws RoomNotFoundException, ActivityNotFoundException {
@@ -69,7 +77,7 @@ public class TaskManager implements TaskGenerator {
 
             LocalDateTime start = firstActivitySlot.getBeginning();
 
-            collector.add(Task.cleaning(roomName, TaskTimeBound.before(start)));
+            collector.add(Task.cleaning(roomManager.findByName(roomName).get(), TaskTimeBound.before(start)));
         }
 
         return collector;
@@ -102,7 +110,7 @@ public class TaskManager implements TaskGenerator {
 
                 TaskTimeBound bound = TaskTimeBound.between(prev.end(), next.getBeginning());
 
-                Task cleaningBetweenActivities = Task.cleaning(name, bound);
+                Task cleaningBetweenActivities = Task.cleaning(roomManager.findByName(name).get(), bound);
 
                 collector.add(cleaningBetweenActivities);
             }
@@ -128,7 +136,7 @@ public class TaskManager implements TaskGenerator {
 
             LocalDateTime end = lastActivitySlot.end();
 
-            collector.add(Task.cleaning(roomName, TaskTimeBound.after(end)));
+            collector.add(Task.cleaning(roomManager.findByName(roomName).get(), TaskTimeBound.after(end)));
         }
 
         return collector;

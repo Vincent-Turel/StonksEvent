@@ -1,39 +1,86 @@
 package fr.stonksdev.backend.entities;
 
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
+@Entity
 public class Task {
-    public Kind kind;
-    public TaskTimeBound timeBound;
+    @Id
+    @GeneratedValue
+    private Long id;
 
-    public Task(Kind kind, TaskTimeBound timeBound) {
+    @NotNull
+    private Kind kind;
+
+    @NotNull
+    @Embedded
+    private TaskTimeBound timeBound;
+
+    @OneToOne
+    @NotNull
+    private Room room;
+
+    public Task(Room room, Kind kind, TaskTimeBound timeBound) {
         this.kind = kind;
         this.timeBound = timeBound;
+        this.room = room;
     }
 
-    public static Task cleaning(String room, TaskTimeBound timeBound) {
-        return new Task(Kind.Cleaning, timeBound);
+    public Task() {
+
+    }
+
+    public static Task cleaning(Room room, TaskTimeBound timeBound) {
+        return new Task(room, Kind.Cleaning, timeBound);
     }
 
     public enum Kind {
         Cleaning
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Kind getKind() {
+        return kind;
+    }
+
+    public void setKind(Kind kind) {
+        this.kind = kind;
+    }
+
+    public TaskTimeBound getTimeBound() {
+        return timeBound;
+    }
+
+    public void setTimeBound(TaskTimeBound timeBound) {
+        this.timeBound = timeBound;
+    }
+
+    public Room getRoom() {
+        return room;
+    }
+
+    public void setRoom(Room room) {
+        this.room = room;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
+        if (!(o instanceof Task)) return false;
         Task task = (Task) o;
-
-        if (kind != task.kind) return false;
-        return Objects.equals(timeBound, task.timeBound);
+        return kind == task.kind && Objects.equals(timeBound, task.timeBound) && Objects.equals(room, task.room);
     }
 
     @Override
     public int hashCode() {
-        int result = kind != null ? kind.hashCode() : 0;
-        result = 31 * result + (timeBound != null ? timeBound.hashCode() : 0);
-        return result;
+        return Objects.hash(kind, timeBound, room);
     }
 }
