@@ -35,7 +35,7 @@ pipeline {
                 }
                 not {
                    anyOf {
-                     branch 'main'
+                     branch 'master'
                      branch 'develop'
                    }
                 }
@@ -102,7 +102,7 @@ pipeline {
         }
         stage('Build all') {
             when {
-                expression { env.BRANCH_NAME == 'main' }
+                expression { env.BRANCH_NAME == 'master' }
             }
             steps {
                 dir("${env.WORKSPACE}/backend"){
@@ -132,7 +132,7 @@ pipeline {
         stage('Publish on Docker') {
             when {
                 anyOf {
-                    branch "develop"
+                    branch "master"
                 }
             }
 
